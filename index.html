@@ -1,0 +1,1920 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Idealiza Hub — Plataforma de Gestão Contábil</title>
+  <link rel="icon" type="image/jpeg" href="favicon.jpg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:          #07090f;
+      --surface:     #0d1117;
+      --card:        #131929;
+      --card-hover:  #182035;
+      --border:      rgba(255,255,255,.07);
+      --border-glow: rgba(16,185,129,.25);
+      --primary:     #10b981;
+      --primary-d:   #059669;
+      --primary-l:   #34d399;
+      --indigo:      #6366f1;
+      --amber:       #f59e0b;
+      --red:         #ef4444;
+      --text:        #f0f4f8;
+      --muted:       #8892a4;
+      --subtle:      #4a5568;
+      --radius:      14px;
+      --radius-sm:   8px;
+    }
+
+    html { scroll-behavior: smooth; font-size: 16px; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Inter', sans-serif;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+    }
+
+    /* ── SCROLLBAR ── */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: var(--bg); }
+    ::-webkit-scrollbar-thumb { background: var(--subtle); border-radius: 3px; }
+
+    /* ── UTILITIES ── */
+    .container { max-width: 1140px; margin: 0 auto; padding: 0 24px; }
+    .tag {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: rgba(16,185,129,.12); color: var(--primary);
+      border: 1px solid rgba(16,185,129,.25);
+      padding: 4px 12px; border-radius: 999px;
+      font-size: .72rem; font-weight: 600; letter-spacing: .06em; text-transform: uppercase;
+    }
+    .section-label { text-align: center; margin-bottom: 16px; }
+    .section-title {
+      text-align: center; font-size: clamp(1.8rem, 4vw, 2.8rem);
+      font-weight: 800; line-height: 1.15; margin-bottom: 16px;
+    }
+    .section-sub {
+      text-align: center; color: var(--muted); font-size: 1.05rem;
+      max-width: 600px; margin: 0 auto 56px;
+    }
+    .reveal { opacity: 0; transform: translateY(28px); transition: opacity .6s ease, transform .6s ease; }
+    .reveal.visible { opacity: 1; transform: none; }
+    .grad-text {
+      background: linear-gradient(135deg, var(--primary-l) 0%, var(--indigo) 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    }
+
+    /* ── NAV ── */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      padding: 0 24px;
+      transition: background .3s, border-color .3s;
+    }
+    nav.scrolled {
+      background: rgba(7,9,15,.85);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border);
+    }
+    .nav-inner {
+      max-width: 1140px; margin: 0 auto;
+      display: flex; align-items: center; justify-content: space-between;
+      height: 68px;
+    }
+    .nav-logo {
+      display: flex; align-items: center; gap: 10px;
+      text-decoration: none;
+    }
+    .nav-logo-icon {
+      width: 36px; height: 36px; border-radius: 9px;
+      background: linear-gradient(135deg, var(--primary), var(--indigo));
+      display: flex; align-items: center; justify-content: center;
+      font-size: .9rem; color: #fff;
+    }
+    .nav-logo-text { font-weight: 700; font-size: 1.1rem; color: var(--text); }
+    .nav-logo-text span { color: var(--primary); }
+    .nav-links { display: flex; align-items: center; gap: 2px; flex-wrap: nowrap; }
+    .nav-links a {
+      color: var(--muted); text-decoration: none; font-size: .8rem;
+      font-weight: 500; padding: 5px 9px; border-radius: var(--radius-sm);
+      transition: color .2s, background .2s; white-space: nowrap;
+    }
+    .nav-links a:hover { color: var(--text); background: rgba(255,255,255,.06); }
+    .nav-cta {
+      background: var(--primary); color: #fff !important;
+      border-radius: var(--radius-sm); padding: 7px 14px !important;
+      transition: background .2s !important;
+    }
+    .nav-cta:hover { background: var(--primary-d) !important; }
+    .nav-hamburger { display: none; background: none; border: none; color: var(--text); font-size: 1.3rem; cursor: pointer; padding: 6px; }
+
+    /* Mobile nav overlay */
+    .nav-links.mobile-open {
+      display: flex !important; flex-direction: column; align-items: stretch;
+      position: fixed; top: 68px; left: 0; right: 0; bottom: 0;
+      background: rgba(7,9,15,.97); backdrop-filter: blur(20px);
+      padding: 20px 24px 40px; gap: 4px; overflow-y: auto; z-index: 99;
+    }
+    .nav-links.mobile-open a {
+      font-size: 1rem; padding: 13px 18px; border-radius: var(--radius-sm);
+      border: 1px solid transparent;
+    }
+    .nav-links.mobile-open a:hover { border-color: var(--border); background: rgba(255,255,255,.06); }
+    .nav-links.mobile-open .nav-cta {
+      margin-top: 8px; text-align: center; padding: 14px 18px !important;
+    }
+
+    /* ── GRID HELPERS ── */
+    .grid-2col {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 16px;
+    }
+
+    /* ── HERO ── */
+    .hero {
+      position: relative; min-height: 100vh;
+      display: flex; align-items: center;
+      padding: 120px 24px 80px;
+      overflow: hidden;
+    }
+    .hero-bg {
+      position: absolute; inset: 0; pointer-events: none;
+    }
+    .hero-bg-grid {
+      position: absolute; inset: 0;
+      background-image:
+        linear-gradient(rgba(16,185,129,.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(16,185,129,.04) 1px, transparent 1px);
+      background-size: 48px 48px;
+    }
+    .hero-bg-glow {
+      position: absolute; border-radius: 50%; filter: blur(120px);
+    }
+    .glow-1 { width: 600px; height: 600px; background: rgba(16,185,129,.12); top: -100px; left: -100px; }
+    .glow-2 { width: 500px; height: 500px; background: rgba(99,102,241,.1); top: 100px; right: -150px; }
+    .glow-3 { width: 400px; height: 400px; background: rgba(16,185,129,.08); bottom: -50px; left: 40%; }
+
+    .hero-content {
+      position: relative; z-index: 2;
+      max-width: 1140px; margin: 0 auto; width: 100%;
+      display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center;
+    }
+    .hero-badge {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: rgba(16,185,129,.1); border: 1px solid rgba(16,185,129,.2);
+      color: var(--primary); padding: 6px 14px; border-radius: 999px;
+      font-size: .78rem; font-weight: 600; letter-spacing: .05em;
+      text-transform: uppercase; margin-bottom: 24px;
+      flex-wrap: wrap; max-width: 100%;
+    }
+    @media (max-width: 480px) {
+      .hero-badge { font-size: .55rem; padding: 4px 10px; gap: 4px; letter-spacing: .02em; }
+      .hero-badge-dot { width: 5px; height: 5px; flex-shrink: 0; }
+    }
+    @media (max-width: 360px) {
+      .hero-badge { font-size: .48rem; padding: 4px 8px; gap: 3px; letter-spacing: 0; }
+    }
+    .hero-badge-dot { width: 7px; height: 7px; background: var(--primary); border-radius: 50%; animation: pulse 2s infinite; }
+    @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.5;transform:scale(1.4)} }
+
+    .hero h1 {
+      font-size: clamp(2.2rem, 5vw, 3.6rem);
+      font-weight: 900; line-height: 1.1; margin-bottom: 20px;
+    }
+    .hero-sub {
+      color: var(--muted); font-size: 1.1rem; line-height: 1.7;
+      margin-bottom: 36px; max-width: 480px;
+    }
+    .hero-btns { display: flex; gap: 12px; flex-wrap: wrap; }
+    .btn {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 12px 24px; border-radius: var(--radius-sm);
+      font-size: .95rem; font-weight: 600; cursor: pointer;
+      text-decoration: none; transition: all .2s; border: none;
+    }
+    .btn-primary { background: var(--primary); color: #fff; }
+    .btn-primary:hover { background: var(--primary-d); transform: translateY(-1px); box-shadow: 0 8px 24px rgba(16,185,129,.35); }
+    .btn-ghost { background: rgba(255,255,255,.07); color: var(--text); border: 1px solid var(--border); }
+    .btn-ghost:hover { background: rgba(255,255,255,.11); }
+
+    /* Hero visual */
+    .hero-visual { position: relative; }
+    .hero-screen {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 40px 80px rgba(0,0,0,.5), 0 0 0 1px rgba(16,185,129,.05);
+    }
+    .hero-screen-bar {
+      background: var(--surface); padding: 10px 16px;
+      display: flex; align-items: center; gap: 8px;
+      border-bottom: 1px solid var(--border);
+    }
+    .screen-dot { width: 10px; height: 10px; border-radius: 50%; }
+    .screen-body { padding: 20px; }
+    .screen-row { display: flex; gap: 10px; margin-bottom: 10px; }
+    .screen-card {
+      flex: 1; background: var(--surface);
+      border: 1px solid var(--border); border-radius: var(--radius-sm);
+      padding: 14px;
+    }
+    .screen-card-label { font-size: .68rem; color: var(--muted); margin-bottom: 4px; }
+    .screen-card-val { font-size: 1.3rem; font-weight: 700; }
+    .screen-bar-row { display: flex; gap: 4px; height: 10px; border-radius: 4px; overflow: hidden; margin-bottom: 6px; }
+    .bar-g { background: var(--primary); }
+    .bar-y { background: var(--amber); }
+    .bar-r { background: var(--red); }
+    .screen-client-row {
+      display: flex; align-items: center; gap: 10px;
+      padding: 8px 10px; border-radius: var(--radius-sm);
+      background: var(--surface); margin-bottom: 6px;
+      border: 1px solid var(--border);
+    }
+    .client-avatar {
+      width: 28px; height: 28px; border-radius: 6px;
+      background: linear-gradient(135deg, var(--primary), var(--indigo));
+      display: flex; align-items: center; justify-content: center;
+      font-size: .65rem; font-weight: 700; color: #fff; flex-shrink: 0;
+    }
+    .client-info { flex: 1; }
+    .client-name { font-size: .72rem; font-weight: 600; }
+    .client-cnpj { font-size: .62rem; color: var(--muted); }
+    .status-badge {
+      font-size: .6rem; font-weight: 600; padding: 2px 7px;
+      border-radius: 999px;
+    }
+    .status-ok { background: rgba(16,185,129,.15); color: var(--primary); }
+    .status-warn { background: rgba(245,158,11,.15); color: var(--amber); }
+    .status-err { background: rgba(239,68,68,.15); color: var(--red); }
+
+    /* Floating badges */
+    .hero-float {
+      position: absolute;
+      background: var(--card); border: 1px solid var(--border-glow);
+      border-radius: var(--radius-sm); padding: 10px 14px;
+      display: flex; align-items: center; gap: 8px;
+      box-shadow: 0 8px 32px rgba(0,0,0,.4);
+      animation: float 4s ease-in-out infinite;
+    }
+    .hero-float-1 { top: -20px; right: -20px; animation-delay: 0s; }
+    .hero-float-2 { bottom: 30px; left: -30px; animation-delay: 1.5s; }
+    @keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-8px)} }
+    .float-icon { font-size: 1.1rem; }
+    .float-text { font-size: .72rem; font-weight: 600; }
+    .float-sub { font-size: .62rem; color: var(--muted); }
+
+    /* ── STATS ── */
+    .stats-bar {
+      background: var(--surface);
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      padding: 28px 24px;
+    }
+    .stats-inner {
+      max-width: 1140px; margin: 0 auto;
+      display: grid; grid-template-columns: repeat(4, 1fr);
+      gap: 0;
+    }
+    .stat-item {
+      text-align: center; padding: 8px 24px;
+      border-right: 1px solid var(--border);
+    }
+    .stat-item:last-child { border-right: none; }
+    .stat-num { font-size: 2rem; font-weight: 800; color: var(--primary); }
+    .stat-label { font-size: .8rem; color: var(--muted); margin-top: 2px; }
+
+    /* ── SECTIONS ── */
+    section { padding: 96px 24px; }
+    section:nth-child(even) { background: var(--surface); }
+
+    /* ── OVERVIEW ── */
+    .overview-grid {
+      max-width: 1140px; margin: 0 auto;
+      display: grid; grid-template-columns: 1fr 1fr; gap: 64px; align-items: center;
+    }
+    .overview-text h2 { font-size: clamp(1.8rem,3.5vw,2.6rem); font-weight: 800; line-height: 1.2; margin-bottom: 20px; }
+    .overview-text p { color: var(--muted); line-height: 1.8; margin-bottom: 16px; }
+    .overview-features { list-style: none; margin-top: 24px; display: flex; flex-direction: column; gap: 12px; }
+    .overview-features li {
+      display: flex; align-items: flex-start; gap: 10px;
+      font-size: .93rem; color: var(--muted);
+    }
+    .overview-features li i { color: var(--primary); margin-top: 3px; flex-shrink: 0; }
+    .overview-visual { display: flex; flex-direction: column; gap: 12px; }
+    .ov-card {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 20px 24px;
+      display: flex; align-items: center; gap: 16px;
+      transition: border-color .2s, transform .2s;
+    }
+    .ov-card:hover { border-color: var(--border-glow); transform: translateX(4px); }
+    .ov-card-icon {
+      width: 44px; height: 44px; border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.1rem; flex-shrink: 0;
+    }
+    .ov-card-text h4 { font-size: .9rem; font-weight: 600; margin-bottom: 2px; }
+    .ov-card-text p { font-size: .78rem; color: var(--muted); }
+
+    /* ── MÓDULOS ── */
+    .modules-grid {
+      max-width: 1140px; margin: 0 auto;
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(300px,1fr));
+      gap: 20px;
+    }
+    .module-card {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 28px;
+      transition: border-color .25s, transform .25s, box-shadow .25s;
+      cursor: default;
+    }
+    .module-card:hover {
+      border-color: var(--border-glow);
+      transform: translateY(-4px);
+      box-shadow: 0 20px 40px rgba(0,0,0,.3), 0 0 0 1px rgba(16,185,129,.1);
+    }
+    .module-icon {
+      width: 50px; height: 50px; border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.3rem; margin-bottom: 18px;
+    }
+    .module-card h3 { font-size: 1rem; font-weight: 700; margin-bottom: 10px; }
+    .module-card p { font-size: .85rem; color: var(--muted); line-height: 1.7; margin-bottom: 16px; }
+    .module-tags { display: flex; flex-wrap: wrap; gap: 6px; }
+    .module-tag {
+      font-size: .68rem; font-weight: 600; padding: 3px 8px;
+      border-radius: 4px; background: rgba(255,255,255,.06);
+      color: var(--muted); border: 1px solid var(--border);
+    }
+
+    /* ── DIFERENCIAS ── */
+    .diff-grid {
+      max-width: 1140px; margin: 0 auto;
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(260px,1fr));
+      gap: 20px;
+    }
+    .diff-card {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 28px; position: relative; overflow: hidden;
+    }
+    .diff-card::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+      background: linear-gradient(90deg, var(--primary), var(--indigo));
+    }
+    .diff-card-num {
+      font-size: 2.5rem; font-weight: 900; line-height: 1;
+      background: linear-gradient(135deg, var(--primary-l), var(--indigo));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+      margin-bottom: 12px;
+    }
+    .diff-card h3 { font-size: 1rem; font-weight: 700; margin-bottom: 10px; }
+    .diff-card p { font-size: .85rem; color: var(--muted); line-height: 1.7; }
+
+    /* ── APIS ── */
+    .apis-grid {
+      max-width: 1140px; margin: 0 auto;
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(300px,1fr));
+      gap: 16px;
+    }
+    .api-card {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 22px 24px;
+      display: flex; gap: 16px; align-items: flex-start;
+      transition: border-color .2s;
+    }
+    .api-card:hover { border-color: var(--border-glow); }
+    .api-icon {
+      width: 42px; height: 42px; border-radius: 9px; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center; font-size: 1.1rem;
+    }
+    .api-content h4 { font-size: .92rem; font-weight: 700; margin-bottom: 4px; }
+    .api-content p { font-size: .8rem; color: var(--muted); line-height: 1.6; }
+    .api-method {
+      display: inline-flex; align-items: center; gap: 4px;
+      font-size: .65rem; font-weight: 600; margin-top: 8px;
+      padding: 2px 8px; border-radius: 4px;
+    }
+    .method-api { background: rgba(16,185,129,.12); color: var(--primary); }
+    .method-rpa { background: rgba(99,102,241,.12); color: var(--indigo); }
+    .method-soap { background: rgba(245,158,11,.12); color: var(--amber); }
+
+    /* ── STACK ── */
+    .stack-wrapper { max-width: 1140px; margin: 0 auto; }
+    .stack-group { margin-bottom: 40px; }
+    .stack-group-title {
+      font-size: .75rem; font-weight: 700; letter-spacing: .1em;
+      text-transform: uppercase; color: var(--muted);
+      margin-bottom: 16px; display: flex; align-items: center; gap: 10px;
+    }
+    .stack-group-title::after {
+      content: ''; flex: 1; height: 1px; background: var(--border);
+    }
+    .stack-pills { display: flex; flex-wrap: wrap; gap: 10px; }
+    .stack-pill {
+      display: flex; align-items: center; gap: 8px;
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: var(--radius-sm); padding: 8px 14px;
+      font-size: .83rem; font-weight: 500;
+      transition: border-color .2s, transform .2s;
+    }
+    .stack-pill:hover { border-color: var(--border-glow); transform: translateY(-2px); }
+    .stack-pill i { font-size: .9rem; }
+
+    /* ── ROADMAP ── */
+    .roadmap-wrapper { max-width: 900px; margin: 0 auto; position: relative; }
+    .roadmap-line {
+      position: absolute; left: 28px; top: 28px; bottom: 28px;
+      width: 2px; background: linear-gradient(to bottom, var(--primary), var(--indigo), transparent);
+      border-radius: 1px;
+    }
+    .roadmap-phase {
+      display: flex; gap: 28px; margin-bottom: 36px; position: relative;
+    }
+    .phase-dot {
+      width: 58px; height: 58px; border-radius: 50%; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1rem; font-weight: 800; border: 2px solid var(--primary);
+      background: var(--card); color: var(--primary); z-index: 2;
+      position: relative;
+    }
+    .phase-content {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 22px 26px; flex: 1;
+      transition: border-color .2s;
+    }
+    .phase-content:hover { border-color: var(--border-glow); }
+    .phase-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; flex-wrap: wrap; gap: 8px; }
+    .phase-title { font-size: 1rem; font-weight: 700; }
+    .phase-duration {
+      background: rgba(16,185,129,.1); color: var(--primary);
+      border: 1px solid rgba(16,185,129,.2);
+      padding: 3px 10px; border-radius: 999px;
+      font-size: .72rem; font-weight: 600;
+    }
+    .phase-desc { font-size: .85rem; color: var(--muted); line-height: 1.7; margin-bottom: 14px; }
+    .phase-items { display: flex; flex-wrap: wrap; gap: 6px; }
+    .phase-item {
+      display: flex; align-items: center; gap: 5px;
+      font-size: .75rem; color: var(--muted);
+      background: var(--surface); border: 1px solid var(--border);
+      padding: 3px 8px; border-radius: 4px;
+    }
+    .phase-item i { color: var(--primary); font-size: .65rem; }
+
+    /* ── COMERCIAL ── */
+    .comercial-grid {
+      max-width: 1000px; margin: 0 auto;
+      display: grid; grid-template-columns: repeat(3,1fr);
+      gap: 20px;
+    }
+    .comercial-card {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 32px 28px;
+      text-align: center; position: relative;
+      transition: border-color .25s, transform .25s;
+    }
+    .comercial-card:hover { border-color: var(--border-glow); transform: translateY(-4px); }
+    .comercial-card.featured {
+      border-color: rgba(16,185,129,.4);
+      background: linear-gradient(135deg, rgba(16,185,129,.07), rgba(99,102,241,.05));
+    }
+    .comercial-card.featured::after {
+      content: 'DIFERENCIAL'; position: absolute; top: -12px; left: 50%; transform: translateX(-50%);
+      background: linear-gradient(135deg, var(--primary), var(--indigo));
+      color: #fff; font-size: .6rem; font-weight: 700; letter-spacing: .1em;
+      padding: 3px 12px; border-radius: 999px;
+    }
+    .comercial-icon {
+      width: 60px; height: 60px; border-radius: 14px; margin: 0 auto 20px;
+      display: flex; align-items: center; justify-content: center; font-size: 1.5rem;
+    }
+    .comercial-card h3 { font-size: 1.15rem; font-weight: 800; margin-bottom: 12px; }
+    .comercial-card p { font-size: .85rem; color: var(--muted); line-height: 1.7; margin-bottom: 20px; }
+    .comercial-list { list-style: none; text-align: left; display: flex; flex-direction: column; gap: 8px; }
+    .comercial-list li { display: flex; align-items: flex-start; gap: 8px; font-size: .82rem; color: var(--muted); }
+    .comercial-list li i { color: var(--primary); flex-shrink: 0; margin-top: 2px; }
+
+    /* ── ARCH VISUAL ── */
+    .arch-wrapper { max-width: 900px; margin: 0 auto; }
+    .arch-diagram {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 36px; overflow: auto;
+    }
+    .arch-row { display: flex; gap: 12px; justify-content: center; margin-bottom: 16px; flex-wrap: wrap; }
+    .arch-box {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius-sm); padding: 12px 18px;
+      text-align: center; font-size: .78rem; font-weight: 600;
+      min-width: 120px;
+    }
+    .arch-box.primary-box { border-color: rgba(16,185,129,.4); color: var(--primary); }
+    .arch-box.indigo-box { border-color: rgba(99,102,241,.4); color: var(--indigo); }
+    .arch-box.amber-box { border-color: rgba(245,158,11,.4); color: var(--amber); }
+    .arch-box small { display: block; font-size: .65rem; color: var(--muted); font-weight: 400; margin-top: 2px; }
+    .arch-arrow {
+      display: flex; justify-content: center; margin-bottom: 12px;
+      color: var(--subtle); font-size: .75rem; align-items: center; gap: 6px;
+    }
+    .arch-divider { border: none; border-top: 1px dashed var(--border); margin: 20px 0; }
+
+    /* ── FOOTER ── */
+    footer {
+      background: var(--surface);
+      border-top: 1px solid var(--border);
+      padding: 40px 24px;
+      text-align: center;
+    }
+    .footer-logo { display: inline-flex; align-items: center; gap: 10px; margin-bottom: 16px; }
+    .footer-logo-icon {
+      width: 32px; height: 32px; border-radius: 8px;
+      background: linear-gradient(135deg, var(--primary), var(--indigo));
+      display: flex; align-items: center; justify-content: center;
+      font-size: .8rem; color: #fff;
+    }
+    .footer-logo-text { font-weight: 700; font-size: 1rem; color: var(--text); }
+    .footer-logo-text span { color: var(--primary); }
+    .footer-copy { color: var(--muted); font-size: .82rem; line-height: 1.7; }
+    .footer-confidential {
+      display: inline-flex; align-items: center; gap: 6px;
+      margin-top: 12px; background: rgba(245,158,11,.08);
+      border: 1px solid rgba(245,158,11,.2); color: var(--amber);
+      padding: 6px 14px; border-radius: 6px; font-size: .75rem; font-weight: 500;
+    }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 900px) {
+      .hero-content { grid-template-columns: 1fr; }
+      .hero-visual { display: none; }
+      .overview-grid { grid-template-columns: 1fr; }
+      .comercial-grid { grid-template-columns: 1fr; }
+      .stats-inner { grid-template-columns: repeat(2,1fr); }
+      .stat-item:nth-child(2) { border-right: none; }
+      .nav-links { display: none; }
+      .nav-hamburger { display: block; }
+      .grid-2col { grid-template-columns: 1fr; }
+      .roadmap-phase-table { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+      .roadmap-table-inner { min-width: 560px; }
+      .arch-diagram { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+      .phase-header { flex-direction: column; align-items: flex-start; }
+    }
+    @media (max-width: 600px) {
+      .hero h1 { font-size: 2rem; }
+      .hero-btns { flex-direction: column; }
+      .hero-btns .btn { width: 100%; justify-content: center; }
+      .section-title { font-size: 1.7rem; }
+      .modules-grid { grid-template-columns: 1fr; }
+      .diff-grid { grid-template-columns: 1fr; }
+      .apis-grid { grid-template-columns: 1fr; }
+      .stack-pills { gap: 7px; }
+      .stack-pill { font-size: .78rem; padding: 6px 11px; }
+      .comercial-card { padding: 24px 18px; }
+      .roadmap-phase { flex-direction: column; gap: 14px; }
+      .roadmap-line { display: none; }
+      .phase-dot { width: 44px; height: 44px; font-size: .85rem; }
+    }
+    @media (max-width: 500px) {
+      .stats-inner { grid-template-columns: repeat(2,1fr); }
+      section { padding: 64px 16px; }
+      .container { padding: 0 16px; }
+      .hero { padding: 100px 16px 64px; }
+      .nav-inner { padding: 0; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════ NAV ═══════════════════════════════ -->
+<nav id="navbar">
+  <div class="nav-inner">
+    <a class="nav-logo" href="#">
+      <div class="nav-logo-icon"><i class="fa-solid fa-chart-line"></i></div>
+      <span class="nav-logo-text">Idealiza<span>Hub</span></span>
+    </a>
+    <div class="nav-links" id="nav-links">
+      <a href="#sobre">Sobre</a>
+      <a href="#diferenciais">Diferenciais</a>
+      <a href="#roadmap">Tempo &amp; Fases</a>
+      <a href="#custos">Custos &amp; Projeção</a>
+      <a href="#comercial" class="nav-cta">Modelo Comercial</a>
+    </div>
+    <button class="nav-hamburger" id="nav-hamburger" aria-label="Menu">
+      <i class="fa-solid fa-bars"></i>
+    </button>
+  </div>
+</nav>
+
+<!-- ═══════════════════════════════ HERO ═══════════════════════════════ -->
+<section class="hero" id="hero">
+  <div class="hero-bg">
+    <div class="hero-bg-grid"></div>
+    <div class="hero-bg-glow glow-1"></div>
+    <div class="hero-bg-glow glow-2"></div>
+    <div class="hero-bg-glow glow-3"></div>
+  </div>
+
+  <div class="hero-content container">
+    <div class="hero-left">
+      <div class="hero-badge">
+        <div class="hero-badge-dot"></div>
+        <span style="white-space:nowrap;">Proposta de Projeto &nbsp;·&nbsp; <strong>Pedro Castro</strong> &nbsp;·&nbsp; Abril 2026</span>
+      </div>
+      <h1>
+        Gestão contábil<br />
+        <span class="grad-text">inteligente e automatizada</span>
+      </h1>
+      <p class="hero-sub">
+        Uma plataforma completa desenvolvida sob medida para a Idealiza Contabilidade —
+        monitoramento fiscal automatizado, gestão de equipe, portal do cliente e
+        automações que vão além do mercado atual.
+      </p>
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:28px;padding:10px 16px;background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:var(--radius-sm);width:fit-content;">
+        <img src="perfil.jpg" alt="Pedro Castro" style="width:36px;height:36px;border-radius:50%;object-fit:cover;flex-shrink:0;border:2px solid rgba(16,185,129,.4);" />
+        <div>
+          <div style="font-size:.82rem;font-weight:700;color:var(--text);">Pedro Castro</div>
+          <div style="font-size:.72rem;color:var(--muted);">Desenvolvedor Responsável · Full-stack &amp; Mobile</div>
+        </div>
+      </div>
+      <div class="hero-btns">
+        <a href="#modulos" class="btn btn-primary"><i class="fa-solid fa-grid-2"></i> Ver módulos</a>
+        <a href="#comercial" class="btn btn-ghost"><i class="fa-solid fa-handshake"></i> Modelo comercial</a>
+      </div>
+    </div>
+
+    <div class="hero-visual">
+      <div style="position:relative;">
+        <div class="hero-float hero-float-1" style="z-index:3;">
+          <i class="float-icon fa-solid fa-shield-check" style="color:var(--primary)"></i>
+          <div>
+            <div class="float-text" style="color:var(--primary)">267 clientes</div>
+            <div class="float-sub">monitorados hoje</div>
+          </div>
+        </div>
+        <div class="hero-float hero-float-2" style="z-index:3;">
+          <i class="float-icon fa-solid fa-bolt" style="color:var(--amber)"></i>
+          <div>
+            <div class="float-text">Automação ativa</div>
+            <div class="float-sub">Federal · Estadual · Municipal</div>
+          </div>
+        </div>
+
+        <div class="hero-screen">
+          <div class="hero-screen-bar">
+            <div class="screen-dot" style="background:#ef4444"></div>
+            <div class="screen-dot" style="background:#f59e0b"></div>
+            <div class="screen-dot" style="background:#10b981"></div>
+            <span style="font-size:.72rem;color:var(--muted);margin-left:8px;">MonitorHub · Situação Fiscal</span>
+          </div>
+          <div class="screen-body">
+            <div class="screen-row">
+              <div class="screen-card">
+                <div class="screen-card-label">Em Dia</div>
+                <div class="screen-card-val" style="color:var(--primary)">123</div>
+              </div>
+              <div class="screen-card">
+                <div class="screen-card-label">Pendências</div>
+                <div class="screen-card-val" style="color:var(--amber)">18</div>
+              </div>
+              <div class="screen-card">
+                <div class="screen-card-label">Atenção</div>
+                <div class="screen-card-val" style="color:var(--red)">125</div>
+              </div>
+            </div>
+            <div style="margin-bottom:14px;">
+              <div style="font-size:.68rem;color:var(--muted);margin-bottom:6px;">PGDAS · DCTFWeb · FGTS · Certidões</div>
+              <div class="screen-bar-row"><div class="bar-g" style="width:46%"></div><div class="bar-y" style="width:7%"></div><div class="bar-r" style="width:47%"></div></div>
+              <div class="screen-bar-row"><div class="bar-g" style="width:14%"></div><div class="bar-y" style="width:1%"></div><div class="bar-r" style="width:85%"></div></div>
+              <div class="screen-bar-row"><div class="bar-g" style="width:7%"></div><div class="bar-y" style="width:14%"></div><div class="bar-r" style="width:79%"></div></div>
+            </div>
+            <div class="screen-client-row">
+              <div class="client-avatar">3P</div>
+              <div class="client-info">
+                <div class="client-name">3P Empreendimentos</div>
+                <div class="client-cnpj">40.148.729/0001-24 · Lucro Presumido</div>
+              </div>
+              <span class="status-badge status-warn">Pendência</span>
+            </div>
+            <div class="screen-client-row">
+              <div class="client-avatar" style="background:linear-gradient(135deg,#6366f1,#8b5cf6)">AK</div>
+              <div class="client-info">
+                <div class="client-name">Adriene Kelly NF Seixas</div>
+                <div class="client-cnpj">51.118.943/0001-54 · Simples Nacional</div>
+              </div>
+              <span class="status-badge status-ok">Em dia</span>
+            </div>
+            <div class="screen-client-row">
+              <div class="client-avatar" style="background:linear-gradient(135deg,#f59e0b,#ef4444)">AA</div>
+              <div class="client-info">
+                <div class="client-name">A4 Locações e Serviços</div>
+                <div class="client-cnpj">MEI · Simples Nacional</div>
+              </div>
+              <span class="status-badge status-err">Atenção</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════ STATS ═══════════════════════════════ -->
+<div class="stats-bar">
+  <div class="stats-inner">
+    <div class="stat-item">
+      <div class="stat-num" data-count="8">0</div>
+      <div class="stat-label">Módulos do sistema</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-num" data-count="14">0</div>
+      <div class="stat-label">Integrações governamentais</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-num" data-count="5">0</div>
+      <div class="stat-label">Fases de entrega</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-num">iOS + Android</div>
+      <div class="stat-label">App mobile para clientes</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════ SOBRE ═══════════════════════════════ -->
+<section id="sobre">
+  <div class="overview-grid container">
+    <div class="overview-text reveal">
+      <div class="tag" style="margin-bottom:20px;"><i class="fa-solid fa-circle-info"></i> Sobre o projeto</div>
+      <h2>Uma plataforma <span class="grad-text">construída para a Idealiza</span></h2>
+      <p>
+        Este projeto é uma proposta de <strong style="color:var(--text);">Pedro Castro</strong> para
+        a Idealiza Contabilidade — uma solução interna completa com toda a inteligência do Hubstrom
+        e os diferenciais que o mercado ainda não oferece: automação de obrigações estaduais e
+        municipais de ponta a ponta.
+      </p>
+      <p>
+        Desenvolvido com arquitetura multi-tenant desde a fundação, o sistema está
+        preparado para evoluir para um <strong style="color:var(--primary)">SaaS</strong>,
+        permitindo que a Idealiza monetize a plataforma para outros escritórios contábeis.
+      </p>
+      <ul class="overview-features">
+        <li><i class="fa-solid fa-check"></i> Monitoramento automático das obrigações fiscais de todos os clientes</li>
+        <li><i class="fa-solid fa-check"></i> Portal mobile para que o cliente acompanhe sua situação fiscal</li>
+        <li><i class="fa-solid fa-check"></i> Automações que vão além: ISS municipal, ICMS estadual, SPED</li>
+        <li><i class="fa-solid fa-check"></i> Comunicação integrada via chat no app e WhatsApp</li>
+        <li><i class="fa-solid fa-check"></i> Gestão de documentos, notas fiscais e processos internos</li>
+        <li><i class="fa-solid fa-check"></i> Arquitetura preparada para SaaS multi-tenant</li>
+      </ul>
+    </div>
+    <div class="overview-visual reveal">
+      <div class="ov-card">
+        <div class="ov-card-icon" style="background:rgba(16,185,129,.12);color:var(--primary)"><i class="fa-solid fa-robot"></i></div>
+        <div class="ov-card-text">
+          <h4>Automação via certificado digital</h4>
+          <p>O sistema acessa os portais governamentais automaticamente usando o certificado A1 e a procuração eletrônica de cada cliente.</p>
+        </div>
+      </div>
+      <div class="ov-card">
+        <div class="ov-card-icon" style="background:rgba(99,102,241,.12);color:var(--indigo)"><i class="fa-solid fa-mobile-screen"></i></div>
+        <div class="ov-card-text">
+          <h4>App mobile para os clientes</h4>
+          <p>Cada cliente da Idealiza terá um app onde pode ver certidões, caixa postal, enviar documentos e se comunicar com o escritório.</p>
+        </div>
+      </div>
+      <div class="ov-card">
+        <div class="ov-card-icon" style="background:rgba(245,158,11,.12);color:var(--amber)"><i class="fa-solid fa-store"></i></div>
+        <div class="ov-card-text">
+          <h4>Futuro: SaaS para outros escritórios</h4>
+          <p>A arquitetura multi-tenant permite que a Idealiza venda o acesso à plataforma para outros escritórios contábeis do Brasil.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════ MÓDULOS ═══════════════════════════════ -->
+<section id="modulos">
+  <div class="container">
+    <div class="section-label reveal"><span class="tag"><i class="fa-solid fa-grid-2"></i> Módulos</span></div>
+    <h2 class="section-title reveal">Tudo que o escritório precisa,<br /><span class="grad-text">em uma plataforma</span></h2>
+    <p class="section-sub reveal">Oito módulos integrados cobrindo desde o monitoramento fiscal até a comunicação com os clientes.</p>
+
+    <div class="modules-grid">
+      <div class="module-card reveal">
+        <div class="module-icon" style="background:rgba(16,185,129,.12);color:var(--primary)">
+          <i class="fa-solid fa-shield-halved"></i>
+        </div>
+        <h3>MonitorHub</h3>
+        <p>Monitoramento automático das obrigações fiscais de todos os clientes. PGDAS, DCTFWeb, FGTS Digital, parcelamentos, certidões e caixas postais — tudo atualizado automaticamente.</p>
+        <div class="module-tags">
+          <span class="module-tag">PGDAS</span><span class="module-tag">DCTFWeb</span>
+          <span class="module-tag">FGTS Digital</span><span class="module-tag">Certidões</span>
+          <span class="module-tag">Caixas Postais</span><span class="module-tag">Parcelamentos</span>
+        </div>
+      </div>
+
+      <div class="module-card reveal">
+        <div class="module-icon" style="background:rgba(99,102,241,.12);color:var(--indigo)">
+          <i class="fa-solid fa-list-check"></i>
+        </div>
+        <h3>TaskHub</h3>
+        <p>Gestão completa de processos e tarefas do escritório. Templates de processos recorrentes, calendário, ordem de serviço para clientes e KPIs de desempenho da equipe.</p>
+        <div class="module-tags">
+          <span class="module-tag">Processos</span><span class="module-tag">Calendário</span>
+          <span class="module-tag">Templates</span><span class="module-tag">Ordem de Serviço</span>
+          <span class="module-tag">KPIs</span>
+        </div>
+      </div>
+
+      <div class="module-card reveal">
+        <div class="module-icon" style="background:rgba(245,158,11,.12);color:var(--amber)">
+          <i class="fa-solid fa-comments"></i>
+        </div>
+        <h3>ConnectHub</h3>
+        <p>Comunicação centralizada entre o escritório e seus clientes. Chat no app mobile, integração com WhatsApp e envio de mensagens em lote com templates personalizados.</p>
+        <div class="module-tags">
+          <span class="module-tag">Chat no App</span><span class="module-tag">WhatsApp</span>
+          <span class="module-tag">Envio em Lote</span><span class="module-tag">Notificações Push</span>
+        </div>
+      </div>
+
+      <div class="module-card reveal">
+        <div class="module-icon" style="background:rgba(59,130,246,.12);color:#60a5fa">
+          <i class="fa-solid fa-cloud"></i>
+        </div>
+        <h3>DriveHub</h3>
+        <p>Gestão de documentos em nuvem com estrutura de pastas por cliente. Upload, preview de PDFs, compartilhamento por link e lixeira com recuperação.</p>
+        <div class="module-tags">
+          <span class="module-tag">Armazenamento</span><span class="module-tag">Pastas por Cliente</span>
+          <span class="module-tag">Preview PDF</span><span class="module-tag">Compartilhamento</span>
+        </div>
+      </div>
+
+      <div class="module-card reveal">
+        <div class="module-icon" style="background:rgba(139,92,246,.12);color:#a78bfa">
+          <i class="fa-solid fa-file-invoice"></i>
+        </div>
+        <h3>XMLHub</h3>
+        <p>Download automático de XMLs de notas fiscais da SEFAZ. Organização por cliente, período e valor. Visão estratégica com gráfico de volume por empresa.</p>
+        <div class="module-tags">
+          <span class="module-tag">NF-e</span><span class="module-tag">NFC-e</span>
+          <span class="module-tag">NFSe</span><span class="module-tag">Download Auto</span>
+          <span class="module-tag">Visão Estratégica</span>
+        </div>
+      </div>
+
+      <div class="module-card reveal">
+        <div class="module-icon" style="background:rgba(16,185,129,.12);color:var(--primary)">
+          <i class="fa-solid fa-mobile-screen-button"></i>
+        </div>
+        <h3>Portal do Cliente (App)</h3>
+        <p>Aplicativo iOS e Android para que o cliente acompanhe sua situação fiscal, acesse caixa postal, envie documentos e se comunique com o escritório — na palma da mão.</p>
+        <div class="module-tags">
+          <span class="module-tag">iOS</span><span class="module-tag">Android</span>
+          <span class="module-tag">Situação Fiscal</span><span class="module-tag">Caixa Postal</span>
+          <span class="module-tag">Chat</span>
+        </div>
+      </div>
+
+      <div class="module-card reveal">
+        <div class="module-icon" style="background:rgba(239,68,68,.12);color:#f87171">
+          <i class="fa-solid fa-users"></i>
+        </div>
+        <h3>ClienteHub</h3>
+        <p>CRM contábil completo. Cadastro de clientes, gestão de certificados digitais A1, controle de procurações e-CAC, regimes tributários e alertas de vencimento.</p>
+        <div class="module-tags">
+          <span class="module-tag">CRM</span><span class="module-tag">Cert. Digital A1</span>
+          <span class="module-tag">Procuração eCAC</span><span class="module-tag">Alertas</span>
+        </div>
+      </div>
+
+      <div class="module-card reveal">
+        <div class="module-icon" style="background:rgba(245,158,11,.12);color:var(--amber)">
+          <i class="fa-solid fa-user-tie"></i>
+        </div>
+        <h3>Equipe</h3>
+        <p>Gestão completa de colaboradores com controle de acesso granular por módulo, departamentos e histórico de auditoria de todas as ações realizadas na plataforma.</p>
+        <div class="module-tags">
+          <span class="module-tag">Colaboradores</span><span class="module-tag">Permissões</span>
+          <span class="module-tag">Departamentos</span><span class="module-tag">Auditoria</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════ DIFERENCIAIS ═══════════════════════════════ -->
+<section id="diferenciais">
+  <div class="container">
+    <div class="section-label reveal"><span class="tag"><i class="fa-solid fa-star"></i> Diferenciais</span></div>
+    <h2 class="section-title reveal">O que vai <span class="grad-text">além do mercado atual</span></h2>
+    <p class="section-sub reveal">Funcionalidades que o Hubstrom e outros concorrentes não oferecem — o verdadeiro diferencial competitivo da plataforma.</p>
+
+    <div class="diff-grid">
+      <div class="diff-card reveal">
+        <div class="diff-card-num">01</div>
+        <h3><i class="fa-solid fa-city" style="color:var(--primary);margin-right:8px;"></i>Obrigações Municipais</h3>
+        <p>Integração com APIs das prefeituras (padrão ABRASF e Betha) para download automático de NFSe, monitoramento de guias de ISS e alertas de vencimento. Cobertura inicial: Fortaleza e principais capitais.</p>
+      </div>
+      <div class="diff-card reveal">
+        <div class="diff-card-num">02</div>
+        <h3><i class="fa-solid fa-map" style="color:var(--indigo);margin-right:8px;"></i>Obrigações Estaduais</h3>
+        <p>Automação do SPED Fiscal, DAPI (Ceará), GNRE e certidão da SEFAZ estadual. O sistema cobre as três esferas: federal, estadual e municipal em uma única plataforma.</p>
+      </div>
+      <div class="diff-card reveal">
+        <div class="diff-card-num">03</div>
+        <h3><i class="fa-solid fa-calendar-days" style="color:var(--amber);margin-right:8px;"></i>Calendário Fiscal Inteligente</h3>
+        <p>Visão unificada de todas as obrigações do cliente — federal, estadual e municipal — em um único calendário com alertas antecipados configuráveis e exportação para Google Calendar.</p>
+      </div>
+      <div class="diff-card reveal">
+        <div class="diff-card-num">04</div>
+        <h3><i class="fa-solid fa-robot" style="color:#f87171;margin-right:8px;"></i>Robô de Certidões</h3>
+        <p>Geração automática de certidões federais, estaduais e municipais nas datas configuradas, com armazenamento automático no DriveHub e notificação ao contador e ao cliente.</p>
+      </div>
+      <div class="diff-card reveal">
+        <div class="diff-card-num">05</div>
+        <h3><i class="fa-solid fa-money-bill-trend-up" style="color:var(--primary);margin-right:8px;"></i>Gestão Financeira do Escritório</h3>
+        <p>Controle de honorários, geração de cobranças automáticas (boleto/PIX), dashboard de receita e relatório de inadimplência com follow-up automático via ConnectHub.</p>
+      </div>
+      <div class="diff-card reveal">
+        <div class="diff-card-num">06</div>
+        <h3><i class="fa-solid fa-store" style="color:var(--indigo);margin-right:8px;"></i>Arquitetura SaaS</h3>
+        <p>Multi-tenant desde a fundação com Row-Level Security no PostgreSQL. A Idealiza pode monetizar a plataforma para outros escritórios contábeis do Brasil sem reescrita.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════ APIS ═══════════════════════════════ -->
+<section id="apis">
+  <div class="container">
+    <div class="section-label reveal"><span class="tag"><i class="fa-solid fa-plug"></i> Integrações</span></div>
+    <h2 class="section-title reveal">Conectado às <span class="grad-text">fontes governamentais</span></h2>
+    <p class="section-sub reveal">O sistema acessa automaticamente os portais do governo usando certificado digital e procuração eletrônica — a mesma tecnologia homologada pelo Serpro usada no Hubstrom.</p>
+
+    <div class="apis-grid">
+      <div class="api-card reveal">
+        <div class="api-icon" style="background:rgba(16,185,129,.12);color:var(--primary)"><i class="fa-solid fa-database"></i></div>
+        <div class="api-content">
+          <h4>Serpro — Receita Federal</h4>
+          <p>Consulta de CNPJ, CPF e situação cadastral via API oficial. Homologado pelo Serpro — mesma certificação do Hubstrom.</p>
+          <span class="api-method method-api"><i class="fa-solid fa-circle-check"></i> API REST Oficial</span>
+        </div>
+      </div>
+
+      <div class="api-card reveal">
+        <div class="api-icon" style="background:rgba(99,102,241,.12);color:var(--indigo)"><i class="fa-solid fa-landmark"></i></div>
+        <div class="api-content">
+          <h4>eCAC — Receita Federal</h4>
+          <p>Caixas postais, PGDAS, DCTFWeb, certidões, parcelamentos e declarações — via automação autenticada com certificado digital A1.</p>
+          <span class="api-method method-rpa"><i class="fa-solid fa-robot"></i> RPA + Certificado Digital</span>
+        </div>
+      </div>
+
+      <div class="api-card reveal">
+        <div class="api-icon" style="background:rgba(245,158,11,.12);color:var(--amber)"><i class="fa-solid fa-coins"></i></div>
+        <div class="api-content">
+          <h4>FGTS Digital — Caixa</h4>
+          <p>Monitoramento de declarações e caixa postal do FGTS Digital via API REST oficial com autenticação OAuth 2.0 por certificado digital.</p>
+          <span class="api-method method-api"><i class="fa-solid fa-circle-check"></i> API REST Oficial</span>
+        </div>
+      </div>
+
+      <div class="api-card reveal">
+        <div class="api-icon" style="background:rgba(59,130,246,.12);color:#60a5fa"><i class="fa-solid fa-briefcase"></i></div>
+        <div class="api-content">
+          <h4>DET — Min. do Trabalho</h4>
+          <p>Domicílio Eletrônico Trabalhista: caixa postal, intimações e notificações trabalhistas via API REST oficial do MTE.</p>
+          <span class="api-method method-api"><i class="fa-solid fa-circle-check"></i> API REST Oficial</span>
+        </div>
+      </div>
+
+      <div class="api-card reveal">
+        <div class="api-icon" style="background:rgba(139,92,246,.12);color:#a78bfa"><i class="fa-solid fa-file-invoice-dollar"></i></div>
+        <div class="api-content">
+          <h4>SEFAZ — NF-e Nacional</h4>
+          <p>Download automático de XMLs de NF-e por UF via Web Service SOAP da SEFAZ com certificado digital. Suporte a NF-e, NFC-e e NFSe.</p>
+          <span class="api-method method-soap"><i class="fa-solid fa-gears"></i> Web Service SOAP</span>
+        </div>
+      </div>
+
+      <div class="api-card reveal">
+        <div class="api-icon" style="background:rgba(16,185,129,.12);color:var(--primary)"><i class="fa-solid fa-building-columns"></i></div>
+        <div class="api-content">
+          <h4>Simples Nacional / MEI</h4>
+          <p>PGDAS e PGMEI — situação das apurações mensais, geração de guias DAS via automação no portal do Simples Nacional.</p>
+          <span class="api-method method-rpa"><i class="fa-solid fa-robot"></i> RPA + Certificado Digital</span>
+        </div>
+      </div>
+
+      <div class="api-card reveal">
+        <div class="api-icon" style="background:rgba(239,68,68,.12);color:#f87171"><i class="fa-solid fa-gavel"></i></div>
+        <div class="api-content">
+          <h4>PGFN — Parcelamentos</h4>
+          <p>Situação de parcelamentos da Procuradoria da Fazenda Nacional e emissão de Certidão de Regularidade Fiscal via API pública.</p>
+          <span class="api-method method-api"><i class="fa-solid fa-circle-check"></i> API REST + RPA</span>
+        </div>
+      </div>
+
+      <div class="api-card reveal">
+        <div class="api-icon" style="background:rgba(245,158,11,.12);color:var(--amber)"><i class="fa-solid fa-city"></i></div>
+        <div class="api-content">
+          <h4>Prefeituras — NFSe / ISS</h4>
+          <p>Integração com prefeituras via padrão ABRASF (Fortaleza e outros) e Betha para download de NFSe e monitoramento de guias de ISS.</p>
+          <span class="api-method method-api"><i class="fa-solid fa-circle-check"></i> API REST Municipal</span>
+        </div>
+      </div>
+
+      <div class="api-card reveal">
+        <div class="api-icon" style="background:rgba(99,102,241,.12);color:var(--indigo)"><i class="fa-solid fa-map-location-dot"></i></div>
+        <div class="api-content">
+          <h4>SEFAZ Estadual — SPED / ICMS</h4>
+          <p>SPED Fiscal, DAPI (Ceará), GNRE e certidão estadual via Web Service SOAP da SEFAZ do estado com certificado digital.</p>
+          <span class="api-method method-soap"><i class="fa-solid fa-gears"></i> Web Service SOAP</span>
+        </div>
+      </div>
+    </div>
+
+    <div style="max-width:700px;margin:48px auto 0;background:var(--card);border:1px solid rgba(245,158,11,.2);border-radius:var(--radius);padding:20px 24px;display:flex;gap:16px;align-items:flex-start;" class="reveal">
+      <i class="fa-solid fa-triangle-exclamation" style="color:var(--amber);margin-top:2px;flex-shrink:0;font-size:1.1rem;"></i>
+      <div>
+        <strong style="font-size:.88rem;">Como funciona o acesso aos portais governamentais</strong>
+        <p style="font-size:.82rem;color:var(--muted);margin-top:4px;line-height:1.7;">
+          Os portais como eCAC e Simples Nacional não possuem API pública oficial. O sistema utiliza
+          <strong>RPA (Robotic Process Automation)</strong> — robôs que navegam nesses portais usando
+          o certificado digital A1 e a procuração eletrônica do cliente, exatamente como o Hubstrom faz.
+          O certificado A1 é armazenado de forma encriptada (AES-256) e nunca trafega em texto claro.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════ STACK ═══════════════════════════════ -->
+<section id="stack">
+  <div class="container">
+    <div class="section-label reveal"><span class="tag"><i class="fa-solid fa-code"></i> Tecnologias</span></div>
+    <h2 class="section-title reveal">Stack <span class="grad-text">moderna e escalável</span></h2>
+    <p class="section-sub reveal">Tecnologias consolidadas no mercado, escolhidas para máxima produtividade, performance e capacidade de escalar para o SaaS.</p>
+
+    <div class="stack-wrapper">
+      <div class="stack-group reveal">
+        <div class="stack-group-title"><i class="fa-solid fa-desktop"></i> Front-end Web (Painel do escritório)</div>
+        <div class="stack-pills">
+          <div class="stack-pill"><i class="fa-brands fa-react" style="color:#61dafb"></i> React 18</div>
+          <div class="stack-pill"><i class="fa-solid fa-bolt" style="color:var(--amber)"></i> Vite</div>
+          <div class="stack-pill"><i class="fa-brands fa-js" style="color:#f7df1e"></i> TypeScript</div>
+          <div class="stack-pill"><i class="fa-solid fa-wind" style="color:#38bdf8"></i> TailwindCSS</div>
+          <div class="stack-pill"><i class="fa-solid fa-layer-group" style="color:var(--text)"></i> shadcn/ui</div>
+          <div class="stack-pill"><i class="fa-solid fa-rotate" style="color:var(--primary)"></i> React Query</div>
+          <div class="stack-pill"><i class="fa-solid fa-chart-bar" style="color:var(--indigo)"></i> Recharts</div>
+          <div class="stack-pill"><i class="fa-solid fa-route" style="color:#f87171"></i> React Router v6</div>
+        </div>
+      </div>
+
+      <div class="stack-group reveal">
+        <div class="stack-group-title"><i class="fa-solid fa-mobile-screen"></i> App Mobile (Portal do cliente — iOS e Android)</div>
+        <div class="stack-pills">
+          <div class="stack-pill"><i class="fa-brands fa-react" style="color:#61dafb"></i> React Native</div>
+          <div class="stack-pill"><i class="fa-solid fa-cube" style="color:var(--text)"></i> Expo SDK 51+</div>
+          <div class="stack-pill"><i class="fa-solid fa-map" style="color:var(--primary)"></i> Expo Router</div>
+          <div class="stack-pill"><i class="fa-solid fa-bell" style="color:var(--amber)"></i> Expo Notifications</div>
+          <div class="stack-pill"><i class="fa-solid fa-lock" style="color:var(--indigo)"></i> Expo SecureStore</div>
+          <div class="stack-pill"><i class="fa-solid fa-store" style="color:var(--primary)"></i> EAS Build (stores)</div>
+        </div>
+      </div>
+
+      <div class="stack-group reveal">
+        <div class="stack-group-title"><i class="fa-solid fa-server"></i> Back-end (API + Automações)</div>
+        <div class="stack-pills">
+          <div class="stack-pill"><i class="fa-brands fa-node-js" style="color:#68a063"></i> Node.js 20 LTS</div>
+          <div class="stack-pill"><i class="fa-solid fa-bolt" style="color:var(--primary)"></i> Fastify</div>
+          <div class="stack-pill"><i class="fa-brands fa-js" style="color:#f7df1e"></i> TypeScript</div>
+          <div class="stack-pill"><i class="fa-solid fa-database" style="color:#a78bfa"></i> Prisma ORM</div>
+          <div class="stack-pill"><i class="fa-solid fa-diagram-project" style="color:var(--amber)"></i> BullMQ (filas)</div>
+          <div class="stack-pill"><i class="fa-solid fa-robot" style="color:var(--indigo)"></i> Playwright (RPA)</div>
+          <div class="stack-pill"><i class="fa-solid fa-plug" style="color:var(--primary)"></i> Socket.io (chat)</div>
+          <div class="stack-pill"><i class="fa-solid fa-key" style="color:#f87171"></i> JWT + 2FA</div>
+        </div>
+      </div>
+
+      <div class="stack-group reveal">
+        <div class="stack-group-title"><i class="fa-solid fa-hard-drive"></i> Banco de Dados e Infraestrutura</div>
+        <div class="stack-pills">
+          <div class="stack-pill"><i class="fa-solid fa-elephant" style="color:#336791"></i> PostgreSQL 15</div>
+          <div class="stack-pill"><i class="fa-solid fa-memory" style="color:#d9281a"></i> Redis 7</div>
+          <div class="stack-pill"><i class="fa-solid fa-cloud" style="color:#60a5fa"></i> S3 / MinIO</div>
+          <div class="stack-pill"><i class="fa-brands fa-docker" style="color:#2496ed"></i> Docker</div>
+          <div class="stack-pill"><i class="fa-brands fa-github" style="color:var(--text)"></i> GitHub Actions (CI/CD)</div>
+          <div class="stack-pill"><i class="fa-solid fa-shield" style="color:#f87171"></i> Sentry</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════ ARQUITETURA ═══════════════════════════════ -->
+<section id="arquitetura">
+  <div class="container">
+    <div class="section-label reveal"><span class="tag"><i class="fa-solid fa-sitemap"></i> Arquitetura</span></div>
+    <h2 class="section-title reveal">Visão da <span class="grad-text">arquitetura do sistema</span></h2>
+    <p class="section-sub reveal">Todos os componentes se comunicam através de uma API central, com workers assíncronos para as automações fiscais.</p>
+
+    <div class="arch-wrapper reveal">
+      <div class="arch-diagram">
+        <div class="arch-row">
+          <div class="arch-box primary-box"><i class="fa-solid fa-desktop"></i> Web App<small>React · Contadores</small></div>
+          <div class="arch-box primary-box"><i class="fa-solid fa-mobile-screen"></i> App Mobile<small>React Native Expo · Clientes</small></div>
+        </div>
+        <div class="arch-arrow"><i class="fa-solid fa-arrow-down"></i> HTTPS / REST / WebSocket</div>
+        <div class="arch-row">
+          <div class="arch-box indigo-box" style="min-width:300px"><i class="fa-solid fa-shield"></i> API Gateway · Nginx<small>Autenticação JWT · Rate Limiting · SSL</small></div>
+        </div>
+        <div class="arch-arrow"><i class="fa-solid fa-arrow-down"></i></div>
+        <div class="arch-row">
+          <div class="arch-box indigo-box"><i class="fa-solid fa-code"></i> API REST<small>Node.js · Fastify</small></div>
+          <div class="arch-box indigo-box"><i class="fa-solid fa-gears"></i> Workers Fiscais<small>BullMQ · Redis</small></div>
+          <div class="arch-box indigo-box"><i class="fa-solid fa-plug"></i> WebSocket<small>Socket.io · Chat</small></div>
+        </div>
+        <hr class="arch-divider" />
+        <div class="arch-row">
+          <div class="arch-box amber-box"><i class="fa-solid fa-database"></i> PostgreSQL<small>Prisma ORM · Multi-tenant RLS</small></div>
+          <div class="arch-box amber-box"><i class="fa-solid fa-memory"></i> Redis<small>Cache · Filas · Sessões</small></div>
+          <div class="arch-box amber-box"><i class="fa-solid fa-cloud"></i> S3 / MinIO<small>XMLs · Docs · Certificados</small></div>
+        </div>
+        <div class="arch-arrow"><i class="fa-solid fa-arrow-down"></i> Playwright RPA + APIs Oficiais</div>
+        <div class="arch-row">
+          <div class="arch-box" style="font-size:.7rem;"><i class="fa-solid fa-landmark" style="color:var(--indigo)"></i> eCAC</div>
+          <div class="arch-box" style="font-size:.7rem;"><i class="fa-solid fa-coins" style="color:var(--amber)"></i> FGTS Digital</div>
+          <div class="arch-box" style="font-size:.7rem;"><i class="fa-solid fa-database" style="color:var(--primary)"></i> Serpro</div>
+          <div class="arch-box" style="font-size:.7rem;"><i class="fa-solid fa-briefcase" style="color:#60a5fa"></i> DET</div>
+          <div class="arch-box" style="font-size:.7rem;"><i class="fa-solid fa-file-invoice" style="color:#a78bfa"></i> SEFAZ</div>
+          <div class="arch-box" style="font-size:.7rem;"><i class="fa-solid fa-city" style="color:var(--amber)"></i> Prefeituras</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════ SEGURANÇA ═══════════════════════════════ -->
+<section id="seguranca">
+  <div class="container">
+    <div class="section-label reveal"><span class="tag"><i class="fa-solid fa-lock"></i> Segurança</span></div>
+    <h2 class="section-title reveal">Dados sensíveis tratados com <span class="grad-text">máxima segurança</span></h2>
+    <p class="section-sub reveal">O sistema lida com certificados digitais, dados fiscais e informações pessoais. A segurança é requisito de nível 1.</p>
+
+    <div style="max-width:900px;margin:0 auto;display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px;">
+      <div class="api-card reveal">
+        <div class="api-icon" style="background:rgba(16,185,129,.12);color:var(--primary)"><i class="fa-solid fa-key"></i></div>
+        <div class="api-content">
+          <h4>Certificados encriptados</h4>
+          <p>Os arquivos .pfx são encriptados com AES-256 antes de armazenar. A senha nunca aparece em logs ou tráfego de rede.</p>
+        </div>
+      </div>
+      <div class="api-card reveal">
+        <div class="api-icon" style="background:rgba(99,102,241,.12);color:var(--indigo)"><i class="fa-solid fa-shield-halved"></i></div>
+        <div class="api-content">
+          <h4>Isolamento entre clientes</h4>
+          <p>Row-Level Security no PostgreSQL garante que dados de diferentes escritórios jamais se misturam, mesmo num banco compartilhado.</p>
+        </div>
+      </div>
+      <div class="api-card reveal">
+        <div class="api-icon" style="background:rgba(245,158,11,.12);color:var(--amber)"><i class="fa-solid fa-id-card"></i></div>
+        <div class="api-content">
+          <h4>Autenticação forte</h4>
+          <p>JWT de curta duração (15 min) + refresh token + 2FA obrigatório para administradores. Histórico de acessos auditável.</p>
+        </div>
+      </div>
+      <div class="api-card reveal">
+        <div class="api-icon" style="background:rgba(239,68,68,.12);color:#f87171"><i class="fa-solid fa-scale-balanced"></i></div>
+        <div class="api-content">
+          <h4>Conformidade LGPD</h4>
+          <p>Exportação, correção e exclusão de dados do titular. Logs de acesso a dados pessoais. Consentimento explícito no cadastro.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════ ROADMAP ═══════════════════════════════ -->
+<section id="roadmap">
+  <div class="container">
+    <div class="section-label reveal"><span class="tag"><i class="fa-solid fa-calendar-check"></i> Tempo &amp; Fases</span></div>
+    <h2 class="section-title reveal">Cronograma de <span class="grad-text">entregas por fase</span></h2>
+    <p class="section-sub reveal">Cada fase tem duração, entregáveis e valor definidos. A Idealiza começa a usar o sistema antes mesmo de estar completo — e paga conforme recebe.</p>
+
+    <div class="roadmap-wrapper">
+      <div class="roadmap-line"></div>
+
+      <div class="roadmap-phase reveal">
+        <div class="phase-dot" style="font-size:.75rem;">0</div>
+        <div class="phase-content">
+          <div class="phase-header">
+            <span class="phase-title"><i class="fa-solid fa-wrench" style="color:var(--muted);margin-right:8px;"></i>Setup e Fundação Técnica</span>
+            <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+              <span class="phase-duration">2 semanas</span>
+              <span style="background:rgba(16,185,129,.12);color:var(--primary);border:1px solid rgba(16,185,129,.25);padding:3px 10px;border-radius:999px;font-size:.72rem;font-weight:700;">R$ 1.500</span>
+            </div>
+          </div>
+          <p class="phase-desc">Configuração do monorepo, banco de dados, CI/CD e base de todas as aplicações. O ambiente está pronto para o desenvolvimento das funcionalidades.</p>
+          <div class="phase-items">
+            <span class="phase-item"><i class="fa-solid fa-check"></i> Monorepo (Web + Mobile + API)</span>
+            <span class="phase-item"><i class="fa-solid fa-check"></i> PostgreSQL + Redis + S3</span>
+            <span class="phase-item"><i class="fa-solid fa-check"></i> CI/CD (GitHub Actions)</span>
+            <span class="phase-item"><i class="fa-solid fa-check"></i> Layout base e design system</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="roadmap-phase reveal">
+        <div class="phase-dot">1</div>
+        <div class="phase-content">
+          <div class="phase-header">
+            <span class="phase-title"><i class="fa-solid fa-shield-halved" style="color:var(--primary);margin-right:8px;"></i>Autenticação · Clientes · MonitorHub MVP · TaskHub</span>
+            <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+              <span class="phase-duration">10 semanas</span>
+              <span style="background:rgba(16,185,129,.12);color:var(--primary);border:1px solid rgba(16,185,129,.25);padding:3px 10px;border-radius:999px;font-size:.72rem;font-weight:700;">R$ 7.000</span>
+            </div>
+          </div>
+          <p class="phase-desc">O escritório já começa a usar o sistema em produção. Monitoramento automático de PGDAS, DCTFWeb e certidões federais para todos os clientes cadastrados.</p>
+          <div class="phase-items">
+            <span class="phase-item"><i class="fa-solid fa-check"></i> Login + 2FA + permissões</span>
+            <span class="phase-item"><i class="fa-solid fa-check"></i> Cadastro completo de clientes</span>
+            <span class="phase-item"><i class="fa-solid fa-check"></i> Upload de certificados digitais A1</span>
+            <span class="phase-item"><i class="fa-solid fa-check"></i> MonitorHub: PGDAS, DCTFWeb, Certidões</span>
+            <span class="phase-item"><i class="fa-solid fa-check"></i> TaskHub: processos, calendário, OS</span>
+            <span class="phase-item"><i class="fa-solid fa-check"></i> Notificações internas</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="roadmap-phase reveal">
+        <div class="phase-dot">2</div>
+        <div class="phase-content">
+          <div class="phase-header">
+            <span class="phase-title"><i class="fa-solid fa-layer-group" style="color:var(--indigo);margin-right:8px;"></i>XMLHub · DriveHub · MonitorHub Completo · ConnectHub</span>
+            <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+              <span class="phase-duration">12 semanas</span>
+              <span style="background:rgba(16,185,129,.12);color:var(--primary);border:1px solid rgba(16,185,129,.25);padding:3px 10px;border-radius:999px;font-size:.72rem;font-weight:700;">R$ 9.000</span>
+            </div>
+          </div>
+          <p class="phase-desc">Todos os módulos equivalentes ao Hubstrom estão funcionando. FGTS Digital, parcelamentos, caixas postais, gestão de documentos e XMLs de NF-e.</p>
+          <div class="phase-items">
+            <span class="phase-item"><i class="fa-solid fa-check"></i> XMLHub: NF-e automático da SEFAZ</span>
+            <span class="phase-item"><i class="fa-solid fa-check"></i> DriveHub: documentos em nuvem</span>
+            <span class="phase-item"><i class="fa-solid fa-check"></i> FGTS Digital + Parcelamentos</span>
+            <span class="phase-item"><i class="fa-solid fa-check"></i> Caixas postais eCAC, FGTS, DET</span>
+            <span class="phase-item"><i class="fa-solid fa-check"></i> ConnectHub: chat + WhatsApp</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="roadmap-phase reveal">
+        <div class="phase-dot">3</div>
+        <div class="phase-content">
+          <div class="phase-header">
+            <span class="phase-title"><i class="fa-solid fa-mobile-screen" style="color:var(--amber);margin-right:8px;"></i>App Mobile — Portal do Cliente</span>
+            <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+              <span class="phase-duration">8 semanas</span>
+              <span style="background:rgba(16,185,129,.12);color:var(--primary);border:1px solid rgba(16,185,129,.25);padding:3px 10px;border-radius:999px;font-size:.72rem;font-weight:700;">R$ 6.000</span>
+            </div>
+          </div>
+          <p class="phase-desc">Lançamento do aplicativo iOS e Android para os clientes da Idealiza. Portal completo com situação fiscal, caixa postal, chat e envio de documentos.</p>
+          <div class="phase-items">
+            <span class="phase-item"><i class="fa-solid fa-check"></i> App iOS + Android (Expo)</span>
+            <span class="phase-item"><i class="fa-solid fa-check"></i> Dashboard fiscal do cliente</span>
+            <span class="phase-item"><i class="fa-solid fa-check"></i> Caixa postal FGTS Digital + DET</span>
+            <span class="phase-item"><i class="fa-solid fa-check"></i> Chat com o escritório</span>
+            <span class="phase-item"><i class="fa-solid fa-check"></i> Push notifications</span>
+            <span class="phase-item"><i class="fa-solid fa-check"></i> Publicação Google Play + App Store</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="roadmap-phase reveal">
+        <div class="phase-dot">4</div>
+        <div class="phase-content">
+          <div class="phase-header">
+            <span class="phase-title"><i class="fa-solid fa-star" style="color:var(--primary);margin-right:8px;"></i>Automações Extras + Financeiro do Escritório</span>
+            <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+              <span class="phase-duration">10 semanas</span>
+              <span style="background:rgba(16,185,129,.12);color:var(--primary);border:1px solid rgba(16,185,129,.25);padding:3px 10px;border-radius:999px;font-size:.72rem;font-weight:700;">R$ 7.000</span>
+            </div>
+          </div>
+          <p class="phase-desc">Os diferenciais que nenhum concorrente oferece: automação de ISS municipal, ICMS estadual, calendário fiscal completo e controle financeiro do escritório.</p>
+          <div class="phase-items">
+            <span class="phase-item"><i class="fa-solid fa-check"></i> NFSe + ISS (Fortaleza e capitais)</span>
+            <span class="phase-item"><i class="fa-solid fa-check"></i> SPED Fiscal CE + DAPI</span>
+            <span class="phase-item"><i class="fa-solid fa-check"></i> Calendário fiscal inteligente</span>
+            <span class="phase-item"><i class="fa-solid fa-check"></i> Robô de certidões automático</span>
+            <span class="phase-item"><i class="fa-solid fa-check"></i> Controle de honorários + cobranças</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="roadmap-phase reveal">
+        <div class="phase-dot">5</div>
+        <div class="phase-content">
+          <div class="phase-header">
+            <span class="phase-title"><i class="fa-solid fa-store" style="color:var(--indigo);margin-right:8px;"></i>Preparação para SaaS</span>
+            <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+              <span class="phase-duration">6 semanas</span>
+              <span style="background:rgba(16,185,129,.12);color:var(--primary);border:1px solid rgba(16,185,129,.25);padding:3px 10px;border-radius:999px;font-size:.72rem;font-weight:700;">R$ 4.500</span>
+            </div>
+          </div>
+          <p class="phase-desc">A plataforma é aberta para outros escritórios contábeis. Módulo de assinaturas, painel de administração do SaaS e white-label do app mobile.</p>
+          <div class="phase-items">
+            <span class="phase-item"><i class="fa-solid fa-check"></i> Multi-tenant completo (RLS)</span>
+            <span class="phase-item"><i class="fa-solid fa-check"></i> Planos e assinaturas (Asaas)</span>
+            <span class="phase-item"><i class="fa-solid fa-check"></i> Painel super admin</span>
+            <span class="phase-item"><i class="fa-solid fa-check"></i> White-label do app por escritório</span>
+            <span class="phase-item"><i class="fa-solid fa-check"></i> Onboarding de novos escritórios</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- resumo financeiro das fases -->
+    <div style="max-width:860px;margin:0 auto 20px;" class="reveal roadmap-phase-table">
+      <div class="roadmap-table-inner" style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;">
+        <div style="display:grid;grid-template-columns:repeat(7,1fr);text-align:center;border-bottom:1px solid var(--border);" class="roadmap-table-grid">
+          <div style="padding:10px 6px;font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);background:var(--surface);">Fase</div>
+          <div style="padding:10px 6px;font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);background:var(--surface);">0 · Setup</div>
+          <div style="padding:10px 6px;font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);background:var(--surface);">1 · Fundação</div>
+          <div style="padding:10px 6px;font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);background:var(--surface);">2 · Módulos</div>
+          <div style="padding:10px 6px;font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);background:var(--surface);">3 · Mobile</div>
+          <div style="padding:10px 6px;font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);background:var(--surface);">4 · Extras</div>
+          <div style="padding:10px 6px;font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);background:var(--surface);">5 · SaaS</div>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(7,1fr);text-align:center;">
+          <div style="padding:12px 6px;font-size:.7rem;color:var(--muted);border-right:1px solid var(--border);">Duração</div>
+          <div style="padding:12px 6px;font-size:.72rem;color:var(--muted);border-right:1px solid var(--border);">2 sem.</div>
+          <div style="padding:12px 6px;font-size:.72rem;color:var(--muted);border-right:1px solid var(--border);">10 sem.</div>
+          <div style="padding:12px 6px;font-size:.72rem;color:var(--muted);border-right:1px solid var(--border);">12 sem.</div>
+          <div style="padding:12px 6px;font-size:.72rem;color:var(--muted);border-right:1px solid var(--border);">8 sem.</div>
+          <div style="padding:12px 6px;font-size:.72rem;color:var(--muted);border-right:1px solid var(--border);">10 sem.</div>
+          <div style="padding:12px 6px;font-size:.72rem;color:var(--muted);">6 sem.</div>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(7,1fr);text-align:center;border-top:1px solid var(--border);">
+          <div style="padding:12px 6px;font-size:.7rem;color:var(--muted);border-right:1px solid var(--border);background:var(--surface);">Valor</div>
+          <div style="padding:12px 6px;font-size:.8rem;font-weight:700;color:var(--primary);border-right:1px solid var(--border);">R$&nbsp;1.500</div>
+          <div style="padding:12px 6px;font-size:.8rem;font-weight:700;color:var(--primary);border-right:1px solid var(--border);">R$&nbsp;7.000</div>
+          <div style="padding:12px 6px;font-size:.8rem;font-weight:700;color:var(--primary);border-right:1px solid var(--border);">R$&nbsp;9.000</div>
+          <div style="padding:12px 6px;font-size:.8rem;font-weight:700;color:var(--primary);border-right:1px solid var(--border);">R$&nbsp;6.000</div>
+          <div style="padding:12px 6px;font-size:.8rem;font-weight:700;color:var(--primary);border-right:1px solid var(--border);">R$&nbsp;7.000</div>
+          <div style="padding:12px 6px;font-size:.8rem;font-weight:700;color:var(--primary);">R$&nbsp;4.500</div>
+        </div>
+      </div>
+    </div>
+
+    <div style="max-width:860px;margin:0 auto;gap:14px;" class="reveal grid-2col">
+      <div style="background:var(--card);border:1px solid rgba(16,185,129,.3);border-radius:var(--radius);padding:20px 24px;display:flex;align-items:center;gap:16px;">
+        <i class="fa-solid fa-sack-dollar" style="color:var(--primary);font-size:1.8rem;flex-shrink:0;"></i>
+        <div>
+          <div style="font-size:.72rem;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px;">Investimento total no desenvolvimento</div>
+          <div style="font-size:1.6rem;font-weight:900;color:var(--primary);">R$ 35.000</div>
+          <div style="font-size:.75rem;color:var(--muted);margin-top:2px;">Dividido em 6 fases · ~48 semanas</div>
+        </div>
+      </div>
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:20px 24px;display:flex;align-items:center;gap:16px;">
+        <i class="fa-solid fa-receipt" style="color:var(--indigo);font-size:1.6rem;flex-shrink:0;"></i>
+        <div>
+          <div style="font-size:.72rem;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px;">Forma de pagamento por fase</div>
+          <div style="font-size:.9rem;font-weight:700;color:var(--text);">50% no início · 50% na entrega</div>
+          <div style="font-size:.75rem;color:var(--muted);margin-top:2px;">Critérios de aceite definidos em contrato</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════ CUSTOS & PROJEÇÃO SAAS ═══════════════════════════════ -->
+<section id="custos">
+  <div class="container">
+    <div class="section-label reveal"><span class="tag"><i class="fa-solid fa-coins"></i> Custos &amp; Projeção SaaS</span></div>
+    <h2 class="section-title reveal">Infraestrutura enxuta, <span class="grad-text">retorno expressivo</span></h2>
+    <p class="section-sub reveal">Custos operacionais baixos com tecnologia de ponta — e uma projeção realista do potencial de receita quando a plataforma for aberta como SaaS.</p>
+
+    <!-- CUSTOS DE INFRAESTRUTURA -->
+    <div style="max-width:1100px;margin:0 auto 64px;">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:24px;" class="reveal">
+        <div style="font-size:.75rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);">
+          <i class="fa-solid fa-server" style="margin-right:6px;color:var(--primary);"></i>Custos mensais de operação — Fase 1 (uso interno da Idealiza)
+        </div>
+        <div style="flex:1;height:1px;background:var(--border);"></div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;margin-bottom:24px;">
+        <div class="api-card reveal" style="flex-direction:column;gap:10px;">
+          <div style="display:flex;align-items:center;gap:10px;">
+            <div class="api-icon" style="background:rgba(16,185,129,.12);color:var(--primary);width:36px;height:36px;"><i class="fa-solid fa-server" style="font-size:.9rem;"></i></div>
+            <div>
+              <div style="font-size:.82rem;font-weight:700;">Servidor API + Web</div>
+              <div style="font-size:.7rem;color:var(--muted);">Hetzner CX31 — 4 vCPU / 8 GB</div>
+            </div>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;padding-top:8px;border-top:1px solid var(--border);">
+            <span style="font-size:.75rem;color:var(--muted);">por mês</span>
+            <span style="font-size:1.1rem;font-weight:800;color:var(--primary);">~R$ 80</span>
+          </div>
+        </div>
+
+        <div class="api-card reveal" style="flex-direction:column;gap:10px;">
+          <div style="display:flex;align-items:center;gap:10px;">
+            <div class="api-icon" style="background:rgba(99,102,241,.12);color:var(--indigo);width:36px;height:36px;"><i class="fa-solid fa-robot" style="font-size:.9rem;"></i></div>
+            <div>
+              <div style="font-size:.82rem;font-weight:700;">Servidor de Workers RPA</div>
+              <div style="font-size:.7rem;color:var(--muted);">Hetzner CX41 — 8 vCPU / 16 GB</div>
+            </div>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;padding-top:8px;border-top:1px solid var(--border);">
+            <span style="font-size:.75rem;color:var(--muted);">por mês</span>
+            <span style="font-size:1.1rem;font-weight:800;color:var(--indigo);">~R$ 135</span>
+          </div>
+        </div>
+
+        <div class="api-card reveal" style="flex-direction:column;gap:10px;">
+          <div style="display:flex;align-items:center;gap:10px;">
+            <div class="api-icon" style="background:rgba(59,130,246,.12);color:#60a5fa;width:36px;height:36px;"><i class="fa-solid fa-database" style="font-size:.9rem;"></i></div>
+            <div>
+              <div style="font-size:.82rem;font-weight:700;">Banco + Cache</div>
+              <div style="font-size:.7rem;color:var(--muted);">Hetzner CX21 — PostgreSQL + Redis</div>
+            </div>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;padding-top:8px;border-top:1px solid var(--border);">
+            <span style="font-size:.75rem;color:var(--muted);">por mês</span>
+            <span style="font-size:1.1rem;font-weight:800;color:#60a5fa;">~R$ 43</span>
+          </div>
+        </div>
+
+        <div class="api-card reveal" style="flex-direction:column;gap:10px;">
+          <div style="display:flex;align-items:center;gap:10px;">
+            <div class="api-icon" style="background:rgba(245,158,11,.12);color:var(--amber);width:36px;height:36px;"><i class="fa-solid fa-cloud" style="font-size:.9rem;"></i></div>
+            <div>
+              <div style="font-size:.82rem;font-weight:700;">Armazenamento (XMLs, docs)</div>
+              <div style="font-size:.7rem;color:var(--muted);">Hetzner Storage Box — 1 TB</div>
+            </div>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;padding-top:8px;border-top:1px solid var(--border);">
+            <span style="font-size:.75rem;color:var(--muted);">por mês</span>
+            <span style="font-size:1.1rem;font-weight:800;color:var(--amber);">~R$ 62</span>
+          </div>
+        </div>
+
+        <div class="api-card reveal" style="flex-direction:column;gap:10px;">
+          <div style="display:flex;align-items:center;gap:10px;">
+            <div class="api-icon" style="background:rgba(16,185,129,.12);color:var(--primary);width:36px;height:36px;"><i class="fa-solid fa-plug" style="font-size:.9rem;"></i></div>
+            <div>
+              <div style="font-size:.82rem;font-weight:700;">Serpro API</div>
+              <div style="font-size:.7rem;color:var(--muted);">Consultas CNPJ/CPF — plano básico</div>
+            </div>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;padding-top:8px;border-top:1px solid var(--border);">
+            <span style="font-size:.75rem;color:var(--muted);">por mês</span>
+            <span style="font-size:1.1rem;font-weight:800;color:var(--primary);">~R$ 0*</span>
+          </div>
+        </div>
+
+        <div class="api-card reveal" style="flex-direction:column;gap:10px;">
+          <div style="display:flex;align-items:center;gap:10px;">
+            <div class="api-icon" style="background:rgba(139,92,246,.12);color:#a78bfa;width:36px;height:36px;"><i class="fa-brands fa-whatsapp" style="font-size:.9rem;"></i></div>
+            <div>
+              <div style="font-size:.82rem;font-weight:700;">WhatsApp (Evolution API)</div>
+              <div style="font-size:.7rem;color:var(--muted);">Self-hosted — uso interno</div>
+            </div>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;padding-top:8px;border-top:1px solid var(--border);">
+            <span style="font-size:.75rem;color:var(--muted);">por mês</span>
+            <span style="font-size:1.1rem;font-weight:800;color:#a78bfa;">R$ 0</span>
+          </div>
+        </div>
+
+        <div class="api-card reveal" style="flex-direction:column;gap:10px;">
+          <div style="display:flex;align-items:center;gap:10px;">
+            <div class="api-icon" style="background:rgba(239,68,68,.12);color:#f87171;width:36px;height:36px;"><i class="fa-solid fa-shield" style="font-size:.9rem;"></i></div>
+            <div>
+              <div style="font-size:.82rem;font-weight:700;">Monitoramento (Sentry)</div>
+              <div style="font-size:.7rem;color:var(--muted);">Erros em produção — free tier</div>
+            </div>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;padding-top:8px;border-top:1px solid var(--border);">
+            <span style="font-size:.75rem;color:var(--muted);">por mês</span>
+            <span style="font-size:1.1rem;font-weight:800;color:#f87171;">R$ 0</span>
+          </div>
+        </div>
+
+        <div class="api-card reveal" style="flex-direction:column;gap:10px;border-color:rgba(16,185,129,.3);background:linear-gradient(135deg,rgba(16,185,129,.07),transparent);">
+          <div style="display:flex;align-items:center;gap:10px;">
+            <div class="api-icon" style="background:rgba(16,185,129,.2);color:var(--primary);width:36px;height:36px;"><i class="fa-solid fa-calculator" style="font-size:.9rem;"></i></div>
+            <div>
+              <div style="font-size:.82rem;font-weight:700;color:var(--primary);">Total Mensal</div>
+              <div style="font-size:.7rem;color:var(--muted);">Infraestrutura completa</div>
+            </div>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;padding-top:8px;border-top:1px solid rgba(16,185,129,.2);">
+            <span style="font-size:.75rem;color:var(--muted);">por mês</span>
+            <span style="font-size:1.25rem;font-weight:900;color:var(--primary);">~R$ 320</span>
+          </div>
+        </div>
+      </div>
+
+      <p style="font-size:.75rem;color:var(--subtle);text-align:center;" class="reveal">
+        * Serpro oferece plano gratuito com limite de consultas para uso inicial. Plano pago é contratado conforme crescimento.&nbsp;
+        Valores de servidores Hetzner convertidos pela cotação do Euro em Abril/2026.
+      </p>
+    </div>
+
+    <!-- PROJEÇÃO SAAS -->
+    <div style="max-width:1100px;margin:0 auto;">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:24px;" class="reveal">
+        <div style="font-size:.75rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);">
+          <i class="fa-solid fa-chart-line" style="margin-right:6px;color:var(--primary);"></i>Projeção de receita — fase SaaS (outros escritórios)
+        </div>
+        <div style="flex:1;height:1px;background:var(--border);"></div>
+      </div>
+
+      <!-- tabela de projeção -->
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px;margin-bottom:32px;">
+
+        <div class="comercial-card reveal" style="text-align:left;padding:24px;">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+            <div style="font-size:.75rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);">Cenário Conservador</div>
+            <span style="background:rgba(255,255,255,.06);border:1px solid var(--border);border-radius:999px;font-size:.65rem;font-weight:700;padding:2px 8px;color:var(--muted);">10 escritórios</span>
+          </div>
+          <div style="margin-bottom:14px;">
+            <div style="font-size:.72rem;color:var(--muted);margin-bottom:4px;">Receita bruta mensal (MRR)</div>
+            <div style="font-size:1.8rem;font-weight:900;color:var(--text);">R$ 5.000</div>
+            <div style="font-size:.72rem;color:var(--muted);">10 escritórios × R$ 500/mês</div>
+          </div>
+          <hr style="border:none;border-top:1px solid var(--border);margin:14px 0;">
+          <div style="display:flex;flex-direction:column;gap:8px;">
+            <div style="display:flex;justify-content:space-between;font-size:.82rem;">
+              <span style="color:var(--muted);">Infraestrutura</span>
+              <span style="color:var(--red);">− R$ 600</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;font-size:.82rem;">
+              <span style="color:var(--muted);">Manutenção (Pedro Castro)</span>
+              <span style="color:var(--red);">− R$ 2.000</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;font-size:.82rem;">
+              <span style="color:var(--muted);">Revenue Share 10% (Pedro Castro)</span>
+              <span style="color:var(--red);">− R$ 500</span>
+            </div>
+            <hr style="border:none;border-top:1px dashed var(--border);">
+            <div style="display:flex;justify-content:space-between;font-size:.9rem;font-weight:700;">
+              <span>Lucro líquido estimado</span>
+              <span style="color:var(--primary);">R$ 1.900/mês</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;font-size:.78rem;color:var(--muted);">
+              <span>Margem</span>
+              <span style="color:var(--primary);font-weight:600;">38%</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="comercial-card reveal" style="text-align:left;padding:24px;border-color:rgba(16,185,129,.35);background:linear-gradient(135deg,rgba(16,185,129,.07),rgba(99,102,241,.04));">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+            <div style="font-size:.75rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--primary);">Cenário Realista</div>
+            <span style="background:rgba(16,185,129,.12);border:1px solid rgba(16,185,129,.25);border-radius:999px;font-size:.65rem;font-weight:700;padding:2px 8px;color:var(--primary);">50 escritórios</span>
+          </div>
+          <div style="margin-bottom:14px;">
+            <div style="font-size:.72rem;color:var(--muted);margin-bottom:4px;">Receita bruta mensal (MRR)</div>
+            <div style="font-size:1.8rem;font-weight:900;color:var(--primary);">R$ 30.000</div>
+            <div style="font-size:.72rem;color:var(--muted);">50 escritórios × R$ 600/mês (média)</div>
+          </div>
+          <hr style="border:none;border-top:1px solid rgba(16,185,129,.2);margin:14px 0;">
+          <div style="display:flex;flex-direction:column;gap:8px;">
+            <div style="display:flex;justify-content:space-between;font-size:.82rem;">
+              <span style="color:var(--muted);">Infraestrutura escalada</span>
+              <span style="color:var(--red);">− R$ 1.800</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;font-size:.82rem;">
+              <span style="color:var(--muted);">Serpro API (volume)</span>
+              <span style="color:var(--red);">− R$ 500</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;font-size:.82rem;">
+              <span style="color:var(--muted);">Manutenção (Pedro Castro)</span>
+              <span style="color:var(--red);">− R$ 2.000</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;font-size:.82rem;">
+              <span style="color:var(--muted);">Revenue Share 10% (Pedro Castro)</span>
+              <span style="color:var(--red);">− R$ 3.000</span>
+            </div>
+            <hr style="border:none;border-top:1px dashed rgba(16,185,129,.2);">
+            <div style="display:flex;justify-content:space-between;font-size:.9rem;font-weight:700;">
+              <span>Lucro líquido estimado</span>
+              <span style="color:var(--primary);">R$ 22.700/mês</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;font-size:.78rem;color:var(--muted);">
+              <span>Margem</span>
+              <span style="color:var(--primary);font-weight:600;">75,7%</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="comercial-card reveal" style="text-align:left;padding:24px;">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+            <div style="font-size:.75rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);">Cenário Otimista</div>
+            <span style="background:rgba(99,102,241,.1);border:1px solid rgba(99,102,241,.25);border-radius:999px;font-size:.65rem;font-weight:700;padding:2px 8px;color:var(--indigo);">150 escritórios</span>
+          </div>
+          <div style="margin-bottom:14px;">
+            <div style="font-size:.72rem;color:var(--muted);margin-bottom:4px;">Receita bruta mensal (MRR)</div>
+            <div style="font-size:1.8rem;font-weight:900;color:var(--text);">R$ 105.000</div>
+            <div style="font-size:.72rem;color:var(--muted);">150 escritórios × R$ 700/mês (média)</div>
+          </div>
+          <hr style="border:none;border-top:1px solid var(--border);margin:14px 0;">
+          <div style="display:flex;flex-direction:column;gap:8px;">
+            <div style="display:flex;justify-content:space-between;font-size:.82rem;">
+              <span style="color:var(--muted);">Infraestrutura escalada</span>
+              <span style="color:var(--red);">− R$ 5.000</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;font-size:.82rem;">
+              <span style="color:var(--muted);">Serpro + integrações</span>
+              <span style="color:var(--red);">− R$ 2.000</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;font-size:.82rem;">
+              <span style="color:var(--muted);">Manutenção (Pedro Castro)</span>
+              <span style="color:var(--red);">− R$ 2.000</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;font-size:.82rem;">
+              <span style="color:var(--muted);">Revenue Share 10% (Pedro Castro)</span>
+              <span style="color:var(--red);">− R$ 10.500</span>
+            </div>
+            <hr style="border:none;border-top:1px dashed var(--border);">
+            <div style="display:flex;justify-content:space-between;font-size:.9rem;font-weight:700;">
+              <span>Lucro líquido estimado</span>
+              <span style="color:var(--indigo);">R$ 85.500/mês</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;font-size:.78rem;color:var(--muted);">
+              <span>Margem</span>
+              <span style="color:var(--indigo);font-weight:600;">81,4%</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- gráfico de barras visual -->
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:28px 32px;margin-bottom:24px;" class="reveal">
+        <div style="font-size:.78rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:20px;">Crescimento de receita bruta (MRR) por cenário</div>
+        <div style="display:flex;flex-direction:column;gap:14px;">
+          <div>
+            <div style="display:flex;justify-content:space-between;font-size:.78rem;margin-bottom:6px;">
+              <span style="color:var(--muted);">Conservador — 10 escritórios</span>
+              <span style="font-weight:700;color:var(--text);">R$ 5.000/mês</span>
+            </div>
+            <div style="background:var(--surface);border-radius:4px;height:12px;overflow:hidden;">
+              <div class="progress-bar" data-width="5" style="width:0%;height:100%;background:linear-gradient(90deg,var(--primary),var(--primary-l));border-radius:4px;transition:width 1.2s ease;"></div>
+            </div>
+          </div>
+          <div>
+            <div style="display:flex;justify-content:space-between;font-size:.78rem;margin-bottom:6px;">
+              <span style="color:var(--muted);">Realista — 50 escritórios</span>
+              <span style="font-weight:700;color:var(--primary);">R$ 30.000/mês</span>
+            </div>
+            <div style="background:var(--surface);border-radius:4px;height:12px;overflow:hidden;">
+              <div class="progress-bar" data-width="29" style="width:0%;height:100%;background:linear-gradient(90deg,var(--primary),var(--indigo));border-radius:4px;transition:width 1.2s ease .2s;"></div>
+            </div>
+          </div>
+          <div>
+            <div style="display:flex;justify-content:space-between;font-size:.78rem;margin-bottom:6px;">
+              <span style="color:var(--muted);">Otimista — 150 escritórios</span>
+              <span style="font-weight:700;color:var(--indigo);">R$ 105.000/mês</span>
+            </div>
+            <div style="background:var(--surface);border-radius:4px;height:12px;overflow:hidden;">
+              <div class="progress-bar" data-width="100" style="width:0%;height:100%;background:linear-gradient(90deg,var(--indigo),#a78bfa);border-radius:4px;transition:width 1.2s ease .4s;"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- nota de contexto -->
+      <div style="max-width:900px;margin:0 auto;gap:14px;" class="reveal grid-2col">
+        <div style="background:var(--card);border:1px solid rgba(16,185,129,.2);border-radius:var(--radius-sm);padding:16px 18px;">
+          <div style="font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--primary);margin-bottom:6px;"><i class="fa-solid fa-info-circle" style="margin-right:5px;"></i>Referência de mercado</div>
+          <p style="font-size:.8rem;color:var(--muted);line-height:1.7;">O Brasil possui aproximadamente <strong style="color:var(--text);">500.000 escritórios contábeis</strong> ativos. Capturar 0,03% desse mercado já corresponde ao cenário otimista. O Hubstrom, referência direta, já opera com centenas de escritórios clientes.</p>
+        </div>
+        <div style="background:var(--card);border:1px solid rgba(245,158,11,.2);border-radius:var(--radius-sm);padding:16px 18px;">
+          <div style="font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--amber);margin-bottom:6px;"><i class="fa-solid fa-triangle-exclamation" style="margin-right:5px;"></i>Observação</div>
+          <p style="font-size:.8rem;color:var(--muted);line-height:1.7;">Os valores são estimativas baseadas em referências de mercado e custos de infraestrutura atuais. Não incluem impostos sobre a receita, custos de vendas/marketing, nem eventuais contratações futuras de suporte.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════ COMERCIAL ═══════════════════════════════ -->
+<section id="comercial">
+  <div class="container">
+    <div class="section-label reveal"><span class="tag"><i class="fa-solid fa-handshake"></i> Modelo Comercial</span></div>
+    <h2 class="section-title reveal">Uma parceria <span class="grad-text">de longo prazo</span></h2>
+    <p class="section-sub reveal">Proposto por <strong style="color:var(--text);">Pedro Castro</strong> para alinhar os interesses de todos — entrega progressiva de valor, estabilidade para manutenção e participação direta no crescimento do SaaS.</p>
+
+    <div class="comercial-grid">
+      <div class="comercial-card reveal">
+        <div class="comercial-icon" style="background:rgba(16,185,129,.12);color:var(--primary)">
+          <i class="fa-solid fa-code-branch"></i>
+        </div>
+        <h3>Desenvolvimento</h3>
+        <div style="text-align:center;margin-bottom:16px;">
+          <div style="font-size:2rem;font-weight:900;color:var(--primary);">R$ 35.000</div>
+          <div style="font-size:.75rem;color:var(--muted);">valor total · 6 fases · ~48 semanas</div>
+        </div>
+        <p>Valor fixo dividido proporcionalmente entre as 6 fases. Cada fase paga 50% no início e 50% na entrega aprovada.</p>
+        <ul class="comercial-list">
+          <li><i class="fa-solid fa-check"></i> Preço fechado — sem surpresas</li>
+          <li><i class="fa-solid fa-check"></i> 6 fases com entregas independentes</li>
+          <li><i class="fa-solid fa-check"></i> Critérios de aceite em contrato</li>
+          <li><i class="fa-solid fa-check"></i> Possibilidade de pausar entre fases</li>
+          <li><i class="fa-solid fa-check"></i> Código de propriedade da empresa</li>
+        </ul>
+      </div>
+
+      <div class="comercial-card reveal">
+        <div class="comercial-icon" style="background:rgba(99,102,241,.12);color:var(--indigo)">
+          <i class="fa-solid fa-headset"></i>
+        </div>
+        <h3>Manutenção Mensal</h3>
+        <div style="text-align:center;margin-bottom:16px;display:flex;gap:10px;justify-content:center;align-items:flex-end;flex-wrap:wrap;">
+          <div>
+            <div style="font-size:1.5rem;font-weight:900;color:var(--indigo);">R$ 1.000<span style="font-size:.8rem;font-weight:400;">/mês</span></div>
+            <div style="font-size:.68rem;color:var(--muted);">uso interno (Fases 1–4)</div>
+          </div>
+          <div style="color:var(--subtle);font-size:1rem;margin-bottom:4px;">→</div>
+          <div>
+            <div style="font-size:1.5rem;font-weight:900;color:var(--primary);">R$ 2.000<span style="font-size:.8rem;font-weight:400;">/mês</span></div>
+            <div style="font-size:.68rem;color:var(--muted);">a partir do 1º cliente SaaS</div>
+          </div>
+        </div>
+        <p>Inicia na entrega da Fase 1. Garante a estabilidade do sistema — crítico pois os portais governamentais mudam periodicamente.</p>
+        <ul class="comercial-list">
+          <li><i class="fa-solid fa-check"></i> Correção de bugs em produção</li>
+          <li><i class="fa-solid fa-check"></i> Atualização de RPA quando portais mudam</li>
+          <li><i class="fa-solid fa-check"></i> Atualizações de segurança</li>
+          <li><i class="fa-solid fa-check"></i> Suporte a erros e instabilidades</li>
+          <li><i class="fa-solid fa-check"></i> Monitoramento de disponibilidade</li>
+        </ul>
+      </div>
+
+      <div class="comercial-card featured reveal">
+        <div class="comercial-icon" style="background:rgba(16,185,129,.15);color:var(--primary)">
+          <i class="fa-solid fa-chart-line"></i>
+        </div>
+        <h3>Revenue Share — SaaS</h3>
+        <div style="text-align:center;margin-bottom:16px;">
+          <div style="font-size:2.8rem;font-weight:900;background:linear-gradient(135deg,var(--primary-l),var(--indigo));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1;">10%</div>
+          <div style="font-size:.75rem;color:var(--muted);">da receita bruta mensal do SaaS</div>
+          <div style="margin-top:8px;display:inline-block;background:rgba(16,185,129,.1);border:1px solid rgba(16,185,129,.2);color:var(--primary);padding:3px 12px;border-radius:999px;font-size:.72rem;font-weight:700;">por 120 meses (10 anos)</div>
+        </div>
+        <p>A partir do primeiro escritório cliente no SaaS. Pedro Castro participa do crescimento da plataforma que construiu.</p>
+        <ul class="comercial-list">
+          <li><i class="fa-solid fa-check"></i> 10% sobre a receita bruta do SaaS</li>
+          <li><i class="fa-solid fa-check"></i> Duração de 120 meses corridos</li>
+          <li><i class="fa-solid fa-check"></i> Comprovação via relatório mensal</li>
+          <li><i class="fa-solid fa-check"></i> Interesse direto no crescimento</li>
+          <li><i class="fa-solid fa-check"></i> Quem constrói também cresce junto</li>
+        </ul>
+      </div>
+    </div>
+
+    <div style="max-width:800px;margin:40px auto 0;gap:16px;" class="reveal grid-2col">
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:20px 24px;">
+        <div style="font-size:.75rem;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px;"><i class="fa-solid fa-shield-check" style="color:var(--primary);margin-right:6px;"></i>Proteção para a empresa</div>
+        <p style="font-size:.83rem;color:var(--muted);line-height:1.7;">Cada fase tem escopo fechado e critério de aceite — você paga pelo que recebe, fase por fase, sem compromisso de valor total antecipado.</p>
+      </div>
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:20px 24px;">
+        <div style="font-size:.75rem;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px;"><i class="fa-solid fa-handshake" style="color:var(--indigo);margin-right:6px;"></i>Alinhamento de longo prazo</div>
+        <p style="font-size:.83rem;color:var(--muted);line-height:1.7;">O revenue share garante que <strong style="color:var(--text);">Pedro Castro</strong> tenha interesse direto no sucesso comercial do SaaS — quanto mais a Idealiza cresce, melhor para todos.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════ FOOTER ═══════════════════════════════ -->
+<footer>
+  <div class="footer-logo">
+    <div class="footer-logo-icon"><i class="fa-solid fa-chart-line"></i></div>
+    <span class="footer-logo-text">Idealiza<span>Hub</span></span>
+  </div>
+  <p class="footer-copy">
+    Proposta elaborada por <strong>Pedro Castro</strong> — Desenvolvedor Full-stack &amp; Mobile<br />
+    para a <strong>Idealiza Contabilidade</strong> · Abril/2026
+  </p>
+  <div style="display:flex;align-items:center;gap:24px;justify-content:center;margin-top:16px;flex-wrap:wrap;">
+    <div style="display:flex;align-items:center;gap:8px;font-size:.8rem;color:var(--muted);">
+      <i class="fa-brands fa-github"></i> github.com/pedro-castro
+    </div>
+    <div style="width:1px;height:14px;background:var(--border);"></div>
+    <div style="display:flex;align-items:center;gap:8px;font-size:.8rem;color:var(--muted);">
+      <i class="fa-solid fa-envelope"></i> Contato via Idealiza Contabilidade
+    </div>
+  </div>
+  <div class="footer-confidential" style="margin-top:20px;">
+    <i class="fa-solid fa-lock"></i>
+    Documento confidencial — uso exclusivo dos sócios da Idealiza Contabilidade
+  </div>
+</footer>
+
+<script>
+  // ── NAV scroll effect ──
+  const navbar = document.getElementById('navbar');
+  window.addEventListener('scroll', () => {
+    navbar.classList.toggle('scrolled', window.scrollY > 20);
+  });
+
+  // ── Scroll reveal ──
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach((e, i) => {
+      if (e.isIntersecting) {
+        setTimeout(() => e.target.classList.add('visible'), i * 60);
+        observer.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.08, rootMargin: '0px 0px -40px 0px' });
+
+  document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+  // ── Counter animation ──
+  const countObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (!entry.isIntersecting) return;
+      const el = entry.target;
+      const target = parseInt(el.dataset.count);
+      if (isNaN(target)) return;
+      let start = 0;
+      const duration = 1200;
+      const step = timestamp => {
+        if (!start) start = timestamp;
+        const progress = Math.min((timestamp - start) / duration, 1);
+        el.textContent = Math.floor(progress * target) + (progress < 1 ? '' : '+');
+        if (progress < 1) requestAnimationFrame(step);
+        else el.textContent = target + '+';
+      };
+      requestAnimationFrame(step);
+      countObserver.unobserve(el);
+    });
+  }, { threshold: 0.5 });
+
+  document.querySelectorAll('[data-count]').forEach(el => countObserver.observe(el));
+
+  // ── Progress bars (custos) ──
+  const barObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (!entry.isIntersecting) return;
+      entry.target.querySelectorAll('.progress-bar').forEach(bar => {
+        bar.style.width = bar.dataset.width + '%';
+      });
+      barObserver.unobserve(entry.target);
+    });
+  }, { threshold: 0.3 });
+  document.querySelectorAll('.progress-bar').forEach(bar => {
+    barObserver.observe(bar.closest('div[class=""]') || bar.parentElement.parentElement.parentElement);
+  });
+  // fallback simples
+  setTimeout(() => {
+    document.querySelectorAll('.progress-bar').forEach(bar => {
+      if (bar.style.width === '0%') bar.style.width = bar.dataset.width + '%';
+    });
+  }, 800);
+
+  // ── Smooth active nav ──
+  const sections = document.querySelectorAll('section[id]');
+  const navLinks = document.querySelectorAll('.nav-links a[href^="#"]');
+  window.addEventListener('scroll', () => {
+    let current = '';
+    sections.forEach(s => {
+      if (window.scrollY >= s.offsetTop - 120) current = s.id;
+    });
+    navLinks.forEach(a => {
+      const isActive = a.getAttribute('href') === '#' + current;
+      a.style.color = isActive ? 'var(--primary)' : '';
+      if (!a.classList.contains('nav-cta')) {
+        a.style.background = isActive ? 'rgba(16,185,129,.08)' : '';
+      }
+    });
+  });
+
+  // ── Hamburger menu ──
+  const hamburger = document.getElementById('nav-hamburger');
+  const navLinksEl = document.getElementById('nav-links');
+  hamburger.addEventListener('click', () => {
+    const isOpen = navLinksEl.classList.toggle('mobile-open');
+    hamburger.innerHTML = isOpen
+      ? '<i class="fa-solid fa-xmark"></i>'
+      : '<i class="fa-solid fa-bars"></i>';
+    document.body.style.overflow = isOpen ? 'hidden' : '';
+  });
+  navLinksEl.querySelectorAll('a').forEach(a => {
+    a.addEventListener('click', () => {
+      navLinksEl.classList.remove('mobile-open');
+      hamburger.innerHTML = '<i class="fa-solid fa-bars"></i>';
+      document.body.style.overflow = '';
+    });
+  });
+</script>
+</body>
+</html>
