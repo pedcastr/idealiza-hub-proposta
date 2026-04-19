@@ -128,21 +128,28 @@
     .nav-cta:hover { background: var(--primary-d) !important; }
     .nav-hamburger { display: none; background: none; border: none; color: var(--text); font-size: 1.3rem; cursor: pointer; padding: 6px; }
 
-    /* Mobile nav overlay */
-    .nav-links.mobile-open {
-      display: flex !important; flex-direction: column; align-items: stretch;
-      position: fixed; top: 68px; left: 0; right: 0; bottom: 0;
+    /* Mobile nav drawer — irmão do <nav>, fora do stacking context do backdrop-filter */
+    .mobile-drawer {
+      display: none;
+      position: fixed; top: 68px; left: 0; right: 0; bottom: 0; z-index: 200;
       background: rgba(7,9,15,.97); backdrop-filter: blur(20px);
-      padding: 20px 24px 40px; gap: 4px; overflow-y: auto; z-index: 99;
+      flex-direction: column; align-items: stretch;
+      padding: 20px 24px 40px; gap: 4px; overflow-y: auto;
     }
-    .nav-links.mobile-open a {
-      font-size: 1rem; padding: 13px 18px; border-radius: var(--radius-sm);
-      border: 1px solid transparent;
+    .mobile-drawer.open { display: flex; }
+    .mobile-drawer a {
+      color: var(--muted); text-decoration: none;
+      font-size: 1rem; font-weight: 500; padding: 13px 18px;
+      border-radius: var(--radius-sm); border: 1px solid transparent;
+      transition: color .2s, background .2s, border-color .2s;
     }
-    .nav-links.mobile-open a:hover { border-color: var(--border); background: rgba(255,255,255,.06); }
-    .nav-links.mobile-open .nav-cta {
-      margin-top: 8px; text-align: center; padding: 14px 18px !important;
+    .mobile-drawer a:hover { color: var(--text); border-color: var(--border); background: rgba(255,255,255,.06); }
+    .mobile-drawer .nav-cta {
+      background: var(--primary); color: #fff !important;
+      margin-top: 8px; text-align: center;
+      padding: 14px 18px !important; border: none !important;
     }
+    .mobile-drawer .nav-cta:hover { background: var(--primary-d) !important; }
 
     /* ── GRID HELPERS ── */
     .grid-2col {
@@ -622,6 +629,15 @@
     </button>
   </div>
 </nav>
+
+<!-- Mobile drawer (fora do nav para evitar clipping pelo backdrop-filter) -->
+<div class="mobile-drawer" id="mobile-drawer">
+  <a href="#sobre">Sobre</a>
+  <a href="#diferenciais">Diferenciais</a>
+  <a href="#roadmap">Tempo &amp; Fases</a>
+  <a href="#custos">Custos &amp; Projeção</a>
+  <a href="#comercial" class="nav-cta">Modelo Comercial</a>
+</div>
 
 <!-- ═══════════════════════════════ HERO ═══════════════════════════════ -->
 <section class="hero" id="hero">
@@ -1913,17 +1929,17 @@
 
   // ── Hamburger menu ──
   const hamburger = document.getElementById('nav-hamburger');
-  const navLinksEl = document.getElementById('nav-links');
+  const drawer = document.getElementById('mobile-drawer');
   hamburger.addEventListener('click', () => {
-    const isOpen = navLinksEl.classList.toggle('mobile-open');
+    const isOpen = drawer.classList.toggle('open');
     hamburger.innerHTML = isOpen
       ? '<i class="fa-solid fa-xmark"></i>'
       : '<i class="fa-solid fa-bars"></i>';
     document.body.style.overflow = isOpen ? 'hidden' : '';
   });
-  navLinksEl.querySelectorAll('a').forEach(a => {
+  drawer.querySelectorAll('a').forEach(a => {
     a.addEventListener('click', () => {
-      navLinksEl.classList.remove('mobile-open');
+      drawer.classList.remove('open');
       hamburger.innerHTML = '<i class="fa-solid fa-bars"></i>';
       document.body.style.overflow = '';
     });
